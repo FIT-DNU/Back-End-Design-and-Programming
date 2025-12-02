@@ -1,0 +1,192 @@
+﻿@model student_management.Models.Student
+
+@{
+    ViewData["Title"] = "Chi tiết sinh viên";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-action="Index">Danh sách sinh viên</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Chi tiết</li>
+                </ol>
+            </nav>
+            <h1 class="display-6 fw-bold text-primary">
+                <i class="bi bi-person-badge"></i> Thông tin sinh viên
+            </h1>
+        </div>
+    </div>
+
+    <!-- Student Details Card -->
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <div class="mb-4 mt-3">
+                        @if (!string.IsNullOrEmpty(Model.ImgUrl))
+                        {
+                            <img src="@Model.ImgUrl" alt="@Model.Name" class="student-detail-avatar rounded-circle shadow" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="student-detail-avatar-fallback rounded-circle shadow mx-auto" style="display:none;">
+                                <span class="display-3">@(Model.Name?.FirstOrDefault().ToString().ToUpper() ?? "?")</span>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="student-detail-avatar-fallback rounded-circle shadow mx-auto">
+                                <span class="display-3">@(Model.Name?.FirstOrDefault().ToString().ToUpper() ?? "?")</span>
+                            </div>
+                        }
+                    </div>
+                    <h3 class="fw-bold mb-1">@Model.Name</h3>
+                    <p class="text-muted mb-3">
+                        @if (Model.Gender == 1)
+                        {
+                            <span class="badge bg-primary-subtle text-primary px-3 py-2">
+                                <i class="bi bi-gender-male"></i> Nam
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger-subtle text-danger px-3 py-2">
+                                <i class="bi bi-gender-female"></i> Nữ
+                            </span>
+                        }
+                    </p>
+                    <div class="d-grid gap-2 mt-4">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-lg">
+                            <i class="bi bi-pencil"></i> Chỉnh sửa
+                        </a>
+                        <a asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                            <i class="bi bi-arrow-left"></i> Quay lại
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> Thông tin chi tiết</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <div class="detail-label">
+                                    <i class="bi bi-person text-primary me-2"></i>
+                                    @Html.DisplayNameFor(model => model.Name)
+                                </div>
+                                <div class="detail-value">
+                                    @Html.DisplayFor(model => model.Name)
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <div class="detail-label">
+                                    <i class="bi bi-calendar-event text-primary me-2"></i>
+                                    @Html.DisplayNameFor(model => model.DateOfBirth)
+                                </div>
+                                <div class="detail-value">
+                                    @Model.DateOfBirth.ToString("dd/MM/yyyy")
+                                    <span class="text-muted ms-2">
+                                        (@((DateTime.Now.Year - Model.DateOfBirth.Year)) tuổi)
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <div class="detail-label">
+                                    <i class="bi bi-gender-ambiguous text-primary me-2"></i>
+                                    @Html.DisplayNameFor(model => model.Gender)
+                                </div>
+                                <div class="detail-value">
+                                    @(Model.Gender == 1 ? "Nam" : "Nữ")
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <div class="detail-label">
+                                    <i class="bi bi-geo-alt text-primary me-2"></i>
+                                    @Html.DisplayNameFor(model => model.Region)
+                                </div>
+                                <div class="detail-value">
+                                    @Html.DisplayFor(model => model.Region)
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="detail-item">
+                                <div class="detail-label">
+                                    <i class="bi bi-envelope text-primary me-2"></i>
+                                    @Html.DisplayNameFor(model => model.Email)
+                                </div>
+                                <div class="detail-value">
+                                    <a href="mailto:@Model.Email" class="text-decoration-none">
+                                        @Html.DisplayFor(model => model.Email)
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="detail-item">
+                                <div class="detail-label">
+                                    <i class="bi bi-telephone text-primary me-2"></i>
+                                    @Html.DisplayNameFor(model => model.PhoneNumber)
+                                </div>
+                                <div class="detail-value">
+                                    <a href="tel:@Model.PhoneNumber" class="text-decoration-none">
+                                        @Html.DisplayFor(model => model.PhoneNumber)
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Info Card -->
+            <div class="card shadow-sm border-0 mt-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="bi bi-image"></i> Ảnh đại diện</h5>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(Model.ImgUrl))
+                    {
+                        <div class="detail-item">
+                            <div class="detail-label">
+                                <i class="bi bi-link-45deg text-primary me-2"></i>
+                                URL
+                            </div>
+                            <div class="detail-value">
+                                <a href="@Model.ImgUrl" target="_blank" class="text-decoration-none">
+                                    @Model.ImgUrl
+                                    <i class="bi bi-box-arrow-up-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">
+                            <i class="bi bi-exclamation-circle me-2"></i>
+                            Chưa có ảnh đại diện
+                        </p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

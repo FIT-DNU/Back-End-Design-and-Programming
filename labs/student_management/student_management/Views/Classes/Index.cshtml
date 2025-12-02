@@ -1,0 +1,127 @@
+﻿@model IEnumerable<student_management.Models.Class>
+
+@{
+    ViewData["Title"] = "Quản lý lớp học";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="page-header-section mb-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h1 class="page-title mb-2">
+                <i class="bi bi-building"></i> Danh sách lớp học
+            </h1>
+            <p class="page-subtitle mb-0">
+                Quản lý và theo dõi thông tin lớp học trong hệ thống
+            </p>
+        </div>
+        <div class="page-actions d-flex gap-2 flex-wrap">
+            <button id="refreshBtn" class="btn btn-outline-primary btn-action">
+                <i class="bi bi-arrow-clockwise"></i>
+                <span class="d-none d-lg-inline ms-2">Làm mới</span>
+            </button>
+            <a asp-action="Create" class="btn btn-primary btn-action">
+                <i class="bi bi-plus-circle"></i>
+                <span class="ms-2">Thêm lớp học</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card shadow-sm border-0 h-100 hover-shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h5 class="card-title mb-0 fw-bold text-primary">
+                            <i class="bi bi-building-fill"></i>
+                            @item.Name
+                        </h5>
+                        <span class="badge bg-primary">
+                            @item.Students.Count SV
+                        </span>
+                    </div>
+
+                    <p class="card-text text-muted mb-3">
+                        @if (!string.IsNullOrEmpty(item.Description))
+                        {
+                            @item.Description
+                        }
+                        else
+                        {
+                            <em class="text-muted">Chưa có mô tả</em>
+                        }
+                    </p>
+
+                    <div class="d-flex gap-2 mt-auto">
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info flex-grow-1">
+                            <i class="bi bi-eye"></i> Chi tiết
+                        </a>
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </div>
+                </div>
+
+                @if (item.Students.Any())
+                {
+                    <div class="card-footer bg-light">
+                        <small class="text-muted">
+                            <i class="bi bi-people-fill"></i>
+                            @item.Students.Count sinh viên trong lớp
+                        </small>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@if (!Model.Any())
+{
+    <div class="text-center py-5">
+        <div class="empty-state-icon mb-3">
+            <i class="bi bi-inbox" style="font-size: 4rem; color: #ccc;"></i>
+        </div>
+        <h4>Chưa có lớp học nào</h4>
+        <p class="text-muted">Bắt đầu bằng cách thêm lớp học đầu tiên vào hệ thống</p>
+        <a asp-action="Create" class="btn btn-primary btn-lg">
+            <i class="bi bi-plus-circle me-2"></i>
+            Thêm lớp học đầu tiên
+        </a>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#refreshBtn').click(function() {
+                location.reload();
+            });
+
+            $('.hover-shadow').hover(
+                function() {
+                    $(this).css('transform', 'translateY(-5px)');
+                },
+                function() {
+                    $(this).css('transform', 'translateY(0)');
+                }
+            );
+        });
+    </script>
+}
+
+<style>
+    .hover-shadow {
+        transition: all 0.3s ease;
+    }
+
+        .hover-shadow:hover {
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        }
+</style>

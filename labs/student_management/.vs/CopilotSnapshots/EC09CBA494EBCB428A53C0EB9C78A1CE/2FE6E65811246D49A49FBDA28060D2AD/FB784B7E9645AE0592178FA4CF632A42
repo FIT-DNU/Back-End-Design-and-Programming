@@ -1,0 +1,12 @@
+﻿{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "student_managementContext": "Server=localhost,1433;Database=StudentDB;User Id=SA;Password=123456@Aa;TrustServerCertificate=True;MultipleActiveResultSets=true"
+  }
+}

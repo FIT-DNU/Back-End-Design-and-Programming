@@ -1,0 +1,96 @@
+﻿@model student_management.Models.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Đăng ký tài khoản";
+    Layout = "~/Views/Shared/_LayoutAuth.cshtml";
+}
+
+<div class="auth-header">
+    <h2>
+        <i class="bi bi-person-plus text-success"></i>
+        Đăng ký tài khoản
+    </h2>
+    <p>Tạo tài khoản mới để sử dụng hệ thống</p>
+</div>
+
+<form asp-action="Register" method="post">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Username" class="form-label fw-bold">
+            <i class="bi bi-person"></i> @Html.DisplayNameFor(model => model.Username)
+            <span class="text-danger">*</span>
+        </label>
+        <input asp-for="Username" class="form-control form-control-lg" 
+               placeholder="Nhập tên đăng nhập (3-50 ký tự)" autofocus />
+        <span asp-validation-for="Username" class="text-danger small"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label fw-bold">
+            <i class="bi bi-envelope"></i> @Html.DisplayNameFor(model => model.Email)
+            <span class="text-danger">*</span>
+        </label>
+        <input asp-for="Email" class="form-control form-control-lg" 
+               placeholder="Nhập email" />
+        <span asp-validation-for="Email" class="text-danger small"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="FullName" class="form-label fw-bold">
+            <i class="bi bi-person-badge"></i> @Html.DisplayNameFor(model => model.FullName)
+            <span class="text-danger">*</span>
+        </label>
+        <input asp-for="FullName" class="form-control form-control-lg" 
+               placeholder="Nhập họ và tên đầy đủ" />
+        <span asp-validation-for="FullName" class="text-danger small"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Password" class="form-label fw-bold">
+            <i class="bi bi-lock"></i> @Html.DisplayNameFor(model => model.Password)
+            <span class="text-danger">*</span>
+        </label>
+        <input asp-for="Password" class="form-control form-control-lg" 
+               placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)" />
+        <span asp-validation-for="Password" class="text-danger small"></span>
+    </div>
+
+    <div class="mb-4">
+        <label asp-for="ConfirmPassword" class="form-label fw-bold">
+            <i class="bi bi-lock-fill"></i> @Html.DisplayNameFor(model => model.ConfirmPassword)
+            <span class="text-danger">*</span>
+        </label>
+        <input asp-for="ConfirmPassword" class="form-control form-control-lg" 
+               placeholder="Nhập lại mật khẩu" />
+        <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+    </div>
+
+    <div class="d-grid">
+        <button type="submit" class="btn btn-success btn-auth btn-lg">
+            <i class="bi bi-check-circle"></i> Đăng ký
+        </button>
+    </div>
+</form>
+
+<div class="auth-divider">
+    <span>Hoặc</span>
+</div>
+
+<div class="auth-footer">
+    <p class="mb-0">
+        Đã có tài khoản? 
+        <a asp-action="Login">
+            <i class="bi bi-box-arrow-in-right"></i> Đăng nhập ngay
+        </a>
+    </p>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

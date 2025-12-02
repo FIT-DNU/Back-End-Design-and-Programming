@@ -1,0 +1,492 @@
+﻿@model IEnumerable<student_management.Models.Student>
+
+@{
+    ViewData["Title"] = "Quản lý sinh viên";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    
+    var totalStudents = Model.Count();
+    var maleCount = Model.Count(s => s.Gender == 1);
+    var femaleCount = Model.Count(s => s.Gender == 0);
+    var averageAge = Model.Any() ? (int)Model.Average(s => DateTime.Now.Year - s.DateOfBirth.Year) : 0;
+    var regionsCount = Model.Select(s => s.Region).Distinct().Count();
+}
+
+<!-- Page Header -->
+<div class="page-header-section mb-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h1 class="page-title mb-2">
+                <i class="bi bi-people-fill"></i> Danh sách sinh viên
+            </h1>
+            <p class="page-subtitle mb-0">
+                Quản lý và theo dõi thông tin sinh viên trong hệ thống
+            </p>
+        </div>
+        <div class="page-actions d-flex gap-2 flex-wrap">
+            <button id="exportBtn" class="btn btn-outline-success btn-action" title="Xuất dữ liệu (Alt+E)">
+                <i class="bi bi-file-earmark-excel"></i>
+                <span class="d-none d-lg-inline ms-2">Xuất Excel</span>
+            </button>
+            <button id="refreshBtn" class="btn btn-outline-primary btn-action" title="Làm mới (Alt+R)">
+                <i class="bi bi-arrow-clockwise"></i>
+                <span class="d-none d-lg-inline ms-2">Làm mới</span>
+            </button>
+            <a asp-action="Create" class="btn btn-primary btn-action" title="Thêm mới (Alt+N)">
+                <i class="bi bi-plus-circle"></i>
+                <span class="ms-2">Thêm sinh viên</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Dashboard -->
+<div class="statistics-section mb-4">
+    <div class="row g-3">
+        <div class="col-sm-6 col-xl-3">
+            <div class="stats-card stats-card-primary">
+                <div class="stats-card-icon">
+                    <i class="bi bi-people"></i>
+                </div>
+                <div class="stats-card-body">
+                    <div class="stats-label">Tổng sinh viên</div>
+                    <div class="stats-value">@totalStudents</div>
+                    <div class="stats-trend stats-trend-up">
+                        <i class="bi bi-arrow-up-short"></i>
+                        <span>12% tháng trước</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-sm-6 col-xl-3">
+            <div class="stats-card stats-card-info">
+                <div class="stats-card-icon">
+                    <i class="bi bi-gender-male"></i>
+                </div>
+                <div class="stats-card-body">
+                    <div class="stats-label">Sinh viên nam</div>
+                    <div class="stats-value">@maleCount</div>
+                    <div class="stats-trend">
+                        <span>@((maleCount * 100.0 / (totalStudents > 0 ? totalStudents : 1)).ToString("F1"))%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-sm-6 col-xl-3">
+            <div class="stats-card stats-card-danger">
+                <div class="stats-card-icon">
+                    <i class="bi bi-gender-female"></i>
+                </div>
+                <div class="stats-card-body">
+                    <div class="stats-label">Sinh viên nữ</div>
+                    <div class="stats-value">@femaleCount</div>
+                    <div class="stats-trend">
+                        <span>@((femaleCount * 100.0 / (totalStudents > 0 ? totalStudents : 1)).ToString("F1"))%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-sm-6 col-xl-3">
+            <div class="stats-card stats-card-warning">
+                <div class="stats-card-icon">
+                    <i class="bi bi-geo-alt"></i>
+                </div>
+                <div class="stats-card-body">
+                    <div class="stats-label">Khu vực</div>
+                    <div class="stats-value">@regionsCount</div>
+                    <div class="stats-trend">
+                        <span>Địa điểm</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters Section -->
+<div class="filters-section mb-4">
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-4 col-lg-3">
+                    <label class="form-label">
+                        <i class="bi bi-search me-1"></i>
+                        <span>Tìm kiếm</span>
+                        <kbd class="ms-2">Alt+S</kbd>
+                    </label>
+                    <div class="search-input-group">
+                        <span class="search-icon">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" id="searchInput" class="form-control" placeholder="Tên, email, SĐT..." autocomplete="off">
+                        <button class="btn-clear-search" type="button" id="clearSearch" style="display:none;">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="col-md-2 col-lg-2">
+                    <label class="form-label">
+                        <i class="bi bi-gender-ambiguous me-1"></i>
+                        <span>Giới tính</span>
+                    </label>
+                    <select id="genderFilter" class="form-select">
+                        <option value="">Tất cả</option>
+                        <option value="1">Nam</option>
+                        <option value="0">Nữ</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-2 col-lg-2">
+                    <label class="form-label">
+                        <i class="bi bi-geo-alt me-1"></i>
+                        <span>Khu vực</span>
+                    </label>
+                    <select id="regionFilter" class="form-select">
+                        <option value="">Tất cả</option>
+                        @foreach (var region in Model.Select(m => m.Region).Distinct().OrderBy(r => r))
+                        {
+                            <option value="@region">@region</option>
+                        }
+                    </select>
+                </div>
+                
+                <div class="col-md-2 col-lg-2">
+                    <label class="form-label">
+                        <i class="bi bi-sort-down me-1"></i>
+                        <span>Sắp xếp</span>
+                    </label>
+                    <select id="sortBy" class="form-select">
+                        <option value="name-asc">Tên A-Z</option>
+                        <option value="name-desc">Tên Z-A</option>
+                        <option value="date-asc">Ngày sinh cũ nhất</option>
+                        <option value="date-desc">Ngày sinh mới nhất</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-2 col-lg-3">
+                    <button id="clearFilter" class="btn btn-outline-secondary w-100" title="Xóa bộ lọc (Alt+C)">
+                        <i class="bi bi-x-circle me-1"></i>
+                        <span>Xóa bộ lọc</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Table Controls -->
+<div class="table-controls mb-3">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div class="table-info">
+            <span class="text-muted">
+                <i class="bi bi-list-check me-1"></i>
+                Hiển thị <strong id="showingFrom">1</strong> - <strong id="showingTo">0</strong> 
+                trong số <strong id="totalCount">@Model.Count()</strong> sinh viên
+            </span>
+            <span id="filterStatus" class="ms-3 text-primary" style="display:none;">
+                <i class="bi bi-funnel-fill me-1"></i>
+                <span id="filterMessage"></span>
+            </span>
+        </div>
+        
+        <div class="table-pagination-control">
+            <div class="items-per-page">
+                <label class="form-label mb-0 me-2">
+                    <i class="bi bi-grid-3x3-gap me-1"></i>
+                    <span>Hiển thị:</span>
+                </label>
+                <select id="itemsPerPage" class="form-select form-select-sm">
+                    <option value="10">10</option>
+                    <option value="25" selected>25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                    <option value="all">Tất cả</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Students Table -->
+<div class="table-section">
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-modern mb-0" id="studentsTable">
+                <thead>
+                    <tr>
+                        <th class="th-checkbox">
+                            <div class="custom-checkbox">
+                                <input type="checkbox" id="selectAll" class="form-check-input">
+                                <label for="selectAll"></label>
+                            </div>
+                        </th>
+                        <th class="th-name">@Html.DisplayNameFor(model => model.Name)</th>
+                        <th class="th-dob">@Html.DisplayNameFor(model => model.DateOfBirth)</th>
+                        <th class="th-gender">@Html.DisplayNameFor(model => model.Gender)</th>
+                        <th class="th-email">@Html.DisplayNameFor(model => model.Email)</th>
+                        <th class="th-phone">@Html.DisplayNameFor(model => model.PhoneNumber)</th>
+                        <th class="th-region">@Html.DisplayNameFor(model => model.Region)</th>
+                        <th class="th-actions">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    @foreach (var item in Model)
+                    {
+                        <tr class="student-row"
+                            data-id="@item.Id"
+                            data-name="@item.Name?.ToLower()"
+                            data-email="@item.Email?.ToLower()"
+                            data-phone="@item.PhoneNumber"
+                            data-gender="@item.Gender"
+                            data-region="@item.Region"
+                            data-dob="@item.DateOfBirth.ToString("yyyy-MM-dd")">
+                            <td>
+                                <div class="custom-checkbox">
+                                    <input type="checkbox" class="form-check-input row-checkbox" value="@item.Id" id="checkbox-@item.Id">
+                                    <label for="checkbox-@item.Id"></label>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="student-info">
+                                    <div class="student-avatar">
+                                        @if (!string.IsNullOrEmpty(item.ImgUrl))
+                                        {
+                                            <img src="@item.ImgUrl" alt="@item.Name" 
+                                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                                                 loading="lazy">
+                                            <div class="avatar-fallback" style="display:none;">
+                                                @(item.Name?.FirstOrDefault().ToString().ToUpper() ?? "?")
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="avatar-fallback">
+                                                @(item.Name?.FirstOrDefault().ToString().ToUpper() ?? "?")
+                                            </div>
+                                        }
+                                    </div>
+                                    <div class="student-details">
+                                        <div class="student-name" title="@item.Name">@item.Name</div>
+                                        <div class="student-email d-md-none" title="@item.Email">@item.Email</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="dob-info">
+                                    <div class="dob-date">
+                                        <i class="bi bi-calendar-event me-1"></i>
+                                        <span class="d-none d-lg-inline">@item.DateOfBirth.ToString("dd/MM/yyyy")</span>
+                                        <span class="d-lg-none">@item.DateOfBirth.ToString("dd/MM/yy")</span>
+                                    </div>
+                                    <div class="dob-age">
+                                        @{
+                                            var age = DateTime.Now.Year - item.DateOfBirth.Year;
+                                            if (DateTime.Now.DayOfYear < item.DateOfBirth.DayOfYear) age--;
+                                        }
+                                        @age tuổi
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                @if (item.Gender == 1)
+                                {
+                                    <span class="badge-gender badge-gender-male">
+                                        <i class="bi bi-gender-male"></i>
+                                        <span class="d-none d-xl-inline">Nam</span>
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge-gender badge-gender-female">
+                                        <i class="bi bi-gender-female"></i>
+                                        <span class="d-none d-xl-inline">Nữ</span>
+                                    </span>
+                                }
+                            </td>
+                            <td class="d-none d-md-table-cell">
+                                <div class="email-info">
+                                    <i class="bi bi-envelope me-1"></i>
+                                    <a href="mailto:@item.Email" title="@item.Email">@item.Email</a>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="phone-info">
+                                    <i class="bi bi-telephone me-1"></i>
+                                    <a href="tel:@item.PhoneNumber">@item.PhoneNumber</a>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge-region" title="@item.Region">
+                                    <i class="bi bi-geo-alt me-1"></i>
+                                    <span>@item.Region</span>
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a asp-action="Details" asp-route-id="@item.Id" 
+                                       class="btn-action-icon btn-action-info" 
+                                       title="Xem chi tiết"
+                                       data-bs-toggle="tooltip">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" 
+                                       class="btn-action-icon btn-action-warning" 
+                                       title="Chỉnh sửa"
+                                       data-bs-toggle="tooltip">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" 
+                                       class="btn-action-icon btn-action-danger" 
+                                       title="Xóa"
+                                       data-bs-toggle="tooltip">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Empty State -->
+        @if (!Model.Any())
+        {
+            <div class="empty-state" id="emptyState">
+                <div class="empty-state-icon">
+                    <i class="bi bi-inbox"></i>
+                </div>
+                <h4>Chưa có sinh viên nào</h4>
+                <p>Bắt đầu bằng cách thêm sinh viên đầu tiên vào hệ thống</p>
+                <a asp-action="Create" class="btn btn-primary btn-lg">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    Thêm sinh viên đầu tiên
+                </a>
+            </div>
+        }
+        
+        <!-- No Results State -->
+        <div class="empty-state" id="noResultsState" style="display:none;">
+            <div class="empty-state-icon">
+                <i class="bi bi-search"></i>
+            </div>
+            <h4>Không tìm thấy kết quả</h4>
+            <p>Không có sinh viên nào phù hợp với bộ lọc của bạn</p>
+            <button id="clearFilterFromNoResults" class="btn btn-outline-primary">
+                <i class="bi bi-x-circle me-2"></i>
+                Xóa bộ lọc và thử lại
+            </button>
+        </div>
+        
+        <!-- Table Footer with Pagination -->
+        @if (Model.Any())
+        {
+            <div class="table-footer">
+                <div class="table-footer-left">
+                    <span class="text-muted">
+                        <i class="bi bi-clock-history me-1"></i>
+                        Cập nhật: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")
+                    </span>
+                </div>
+                
+                <div class="table-footer-center">
+                    <nav aria-label="Phân trang">
+                        <ul class="pagination pagination-modern mb-0" id="pagination">
+                            <!-- Pagination generated by JavaScript -->
+                        </ul>
+                    </nav>
+                </div>
+                
+                <div class="table-footer-right">
+                    <span class="text-muted">
+                        <i class="bi bi-database me-1"></i>
+                        Tổng: <strong>@Model.Count()</strong>
+                    </span>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Bulk Actions Bar -->
+<div id="bulkActionsBar" class="bulk-actions-bar">
+    <div class="bulk-actions-content">
+        <div class="bulk-actions-info">
+            <i class="bi bi-check-square me-2"></i>
+            <strong id="selectedCount">0</strong> sinh viên được chọn
+        </div>
+        <div class="bulk-actions-buttons">
+            <button id="bulkExport" class="btn btn-sm btn-light">
+                <i class="bi bi-download me-1"></i>
+                Xuất
+            </button>
+            <button id="clearSelection" class="btn btn-sm btn-outline-light">
+                <i class="bi bi-x me-1"></i>
+                Bỏ chọn
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Keyboard Shortcuts Modal -->
+<div class="modal fade" id="shortcutsModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-keyboard me-2"></i>
+                    Phím tắt
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="shortcuts-list">
+                    <div class="shortcut-item">
+                        <div class="shortcut-keys">
+                            <kbd>Alt</kbd> + <kbd>S</kbd>
+                        </div>
+                        <div class="shortcut-description">Tìm kiếm</div>
+                    </div>
+                    <div class="shortcut-item">
+                        <div class="shortcut-keys">
+                            <kbd>Alt</kbd> + <kbd>N</kbd>
+                        </div>
+                        <div class="shortcut-description">Thêm sinh viên mới</div>
+                    </div>
+                    <div class="shortcut-item">
+                        <div class="shortcut-keys">
+                            <kbd>Alt</kbd> + <kbd>R</kbd>
+                        </div>
+                        <div class="shortcut-description">Làm mới trang</div>
+                    </div>
+                    <div class="shortcut-item">
+                        <div class="shortcut-keys">
+                            <kbd>Alt</kbd> + <kbd>C</kbd>
+                        </div>
+                        <div class="shortcut-description">Xóa bộ lọc</div>
+                    </div>
+                    <div class="shortcut-item">
+                        <div class="shortcut-keys">
+                            <kbd>Alt</kbd> + <kbd>E</kbd>
+                        </div>
+                        <div class="shortcut-description">Xuất Excel</div>
+                    </div>
+                    <div class="shortcut-item">
+                        <div class="shortcut-keys">
+                            <kbd>?</kbd>
+                        </div>
+                        <div class="shortcut-description">Hiện bảng phím tắt</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="~/js/students-list.js" asp-append-version="true"></script>
+}

@@ -1,0 +1,21 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using student_management.Models;
+
+public class StudentStatsViewComponent : ViewComponent
+{
+    public IViewComponentResult Invoke(IEnumerable<Student> students)
+    {
+        var model = new StudentStatsViewModel
+        {
+            TotalStudents = students.Count(),
+            MaleCount = students.Count(s => s.Gender == 1),
+            FemaleCount = students.Count(s => s.Gender == 0),
+            AverageAge = students.Any()
+                ? (int)students.Average(s => DateTime.Now.Year - s.DateOfBirth.Year)
+                : 0,
+            RegionsCount = students.Select(s => s.Region).Distinct().Count()
+        };
+
+        return View(model);
+    }
+}

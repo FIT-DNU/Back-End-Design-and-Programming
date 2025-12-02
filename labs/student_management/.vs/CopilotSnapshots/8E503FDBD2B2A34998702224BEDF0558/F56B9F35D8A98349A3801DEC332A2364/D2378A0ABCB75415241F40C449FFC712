@@ -1,0 +1,426 @@
+﻿@model student_management.Models.Student
+
+@{
+    ViewData["Title"] = "Thêm sinh viên mới";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-action="Index"><i class="bi bi-house-door"></i> Danh sách sinh viên</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Thêm mới</li>
+                </ol>
+            </nav>
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <h1 class="display-6 fw-bold text-primary mb-1">
+                        <i class="bi bi-person-plus"></i> Thêm sinh viên mới
+                    </h1>
+                    <p class="text-muted mb-0">
+                        <i class="bi bi-info-circle"></i> Nhập đầy đủ thông tin sinh viên vào form bên dưới
+                    </p>
+                </div>
+                <div>
+                    <span class="badge bg-primary-subtle text-primary px-3 py-2">
+                        <i class="bi bi-asterisk"></i> Các trường bắt buộc được đánh dấu *
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-9 col-xl-8">
+            <div class="card shadow border-0">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-clipboard-data"></i> Thông tin sinh viên
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Progress Indicator -->
+                    <div class="progress mb-4" style="height: 5px;">
+                        <div id="formProgress" class="progress-bar bg-primary" role="progressbar" style="width: 0%"></div>
+                    </div>
+
+                    <form asp-action="Create" id="createStudentForm" class="needs-validation" novalidate>
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        
+                        <div class="row g-4">
+                            <!-- Image URL Section (Move to top for better UX) -->
+                            <div class="col-md-12">
+                                <div class="card bg-light border-0">
+                                    <div class="card-body">
+                                        <label asp-for="ImgUrl" class="form-label fw-bold">
+                                            <i class="bi bi-image text-primary"></i> @Html.DisplayNameFor(model => model.ImgUrl)
+                                            <span class="badge bg-secondary-subtle text-secondary ms-2">Tùy chọn</span>
+                                        </label>
+                                        <input asp-for="ImgUrl" type="url" class="form-control form-control-lg" 
+                                               placeholder="https://example.com/image.jpg" 
+                                               id="imgUrlInput" />
+                                        <span asp-validation-for="ImgUrl" class="text-danger small"></span>
+                                        <div class="form-text">
+                                            <i class="bi bi-lightbulb"></i> Nhập URL ảnh đại diện hoặc để trống để sử dụng avatar mặc định
+                                        </div>
+                                        
+                                        <!-- Live Image Preview -->
+                                        <div id="imagePreviewSection" class="mt-3" style="display:none;">
+                                            <div class="d-flex align-items-start gap-3">
+                                                <div class="position-relative">
+                                                    <img id="previewImg" src="" alt="Preview" class="rounded-circle shadow" 
+                                                         style="width: 100px; height: 100px; object-fit: cover;">
+                                                    <div id="imageLoadingSpinner" class="position-absolute top-50 start-50 translate-middle" style="display:none;">
+                                                        <div class="spinner-border spinner-border-sm text-primary"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <p class="mb-1 fw-bold text-success">
+                                                        <i class="bi bi-check-circle-fill"></i> Xem trước ảnh đại diện
+                                                    </p>
+                                                    <p class="small text-muted mb-0">Ảnh sẽ được hiển thị như thế này trong hệ thống</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div id="imageError" class="alert alert-warning mt-3" style="display:none;">
+                                            <i class="bi bi-exclamation-triangle"></i> Không thể tải ảnh từ URL này. Vui lòng kiểm tra lại.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Name -->
+                            <div class="col-md-12">
+                                <label asp-for="Name" class="form-label fw-bold">
+                                    <i class="bi bi-person text-primary"></i> @Html.DisplayNameFor(model => model.Name)
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Name" class="form-control form-control-lg" 
+                                       placeholder="Ví dụ: Nguyễn Văn A" 
+                                       required
+                                       autocomplete="name" />
+                                <span asp-validation-for="Name" class="text-danger small"></span>
+                                <div class="form-text">
+                                    <i class="bi bi-info-circle"></i> Nhập họ và tên đầy đủ của sinh viên
+                                </div>
+                            </div>
+
+                            <!-- Date of Birth and Age Display -->
+                            <div class="col-md-6">
+                                <label asp-for="DateOfBirth" class="form-label fw-bold">
+                                    <i class="bi bi-calendar-event text-primary"></i> @Html.DisplayNameFor(model => model.DateOfBirth)
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="DateOfBirth" type="date" class="form-control form-control-lg" 
+                                       id="dateOfBirth"
+                                       max="@DateTime.Now.ToString("yyyy-MM-dd")"
+                                       required />
+                                <span asp-validation-for="DateOfBirth" class="text-danger small"></span>
+                                <div id="ageDisplay" class="form-text" style="display:none;">
+                                    <i class="bi bi-calculator"></i> Tuổi: <strong id="calculatedAge"></strong>
+                                </div>
+                            </div>
+
+                            <!-- Gender -->
+                            <div class="col-md-6">
+                                <label asp-for="Gender" class="form-label fw-bold">
+                                    <i class="bi bi-gender-ambiguous text-primary"></i> @Html.DisplayNameFor(model => model.Gender)
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <select asp-for="Gender" class="form-select form-select-lg" required>
+                                    <option value="">-- Chọn giới tính --</option>
+                                    <option value="1">
+                                        <i class="bi bi-gender-male"></i> Nam
+                                    </option>
+                                    <option value="0">
+                                        <i class="bi bi-gender-female"></i> Nữ
+                                    </option>
+                                </select>
+                                <span asp-validation-for="Gender" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Email -->
+                            <div class="col-md-6">
+                                <label asp-for="Email" class="form-label fw-bold">
+                                    <i class="bi bi-envelope text-primary"></i> @Html.DisplayNameFor(model => model.Email)
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Email" type="email" class="form-control form-control-lg" 
+                                       placeholder="example@email.com" 
+                                       required
+                                       autocomplete="email" />
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                                <div class="form-text">
+                                    <i class="bi bi-shield-check"></i> Email phải là định dạng hợp lệ
+                                </div>
+                            </div>
+
+                            <!-- Phone Number -->
+                            <div class="col-md-6">
+                                <label asp-for="PhoneNumber" class="form-label fw-bold">
+                                    <i class="bi bi-telephone text-primary"></i> @Html.DisplayNameFor(model => model.PhoneNumber)
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="PhoneNumber" type="tel" class="form-control form-control-lg" 
+                                       placeholder="0123456789" 
+                                       pattern="[0-9]{10,11}"
+                                       required
+                                       autocomplete="tel" />
+                                <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                                <div class="form-text">
+                                    <i class="bi bi-info-circle"></i> Số điện thoại gồm 10-11 chữ số
+                                </div>
+                            </div>
+
+                            <!-- Region -->
+                            <div class="col-md-12">
+                                <label asp-for="Region" class="form-label fw-bold">
+                                    <i class="bi bi-geo-alt text-primary"></i> @Html.DisplayNameFor(model => model.Region)
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Region" class="form-control form-control-lg" 
+                                       placeholder="Chọn hoặc nhập khu vực" 
+                                       list="regionList"
+                                       required
+                                       autocomplete="off" />
+                                <datalist id="regionList">
+                                    <option value="Hà Nội"></option>
+                                    <option value="Hồ Chí Minh"></option>
+                                    <option value="Đà Nẵng"></option>
+                                    <option value="Hải Phòng"></option>
+                                    <option value="Cần Thơ"></option>
+                                    <option value="Bình Dương"></option>
+                                    <option value="Đồng Nai"></option>
+                                    <option value="Nghệ An"></option>
+                                    <option value="Thanh Hóa"></option>
+                                    <option value="Quảng Ninh"></option>
+                                </datalist>
+                                <span asp-validation-for="Region" class="text-danger small"></span>
+                                <div class="form-text">
+                                    <i class="bi bi-map"></i> Chọn từ danh sách hoặc nhập khu vực khác
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="row mt-5">
+                            <div class="col-md-12">
+                                <hr class="my-4">
+                                <div class="d-flex flex-column flex-md-row gap-3 justify-content-between align-items-center">
+                                    <a asp-action="Index" class="btn btn-outline-secondary btn-lg px-4 order-md-1">
+                                        <i class="bi bi-x-circle"></i> Hủy bỏ
+                                    </a>
+                                    <div class="d-flex gap-3 order-md-2">
+                                        <button type="reset" class="btn btn-outline-warning btn-lg px-4" id="resetBtn">
+                                            <i class="bi bi-arrow-counterclockwise"></i> Đặt lại
+                                        </button>
+                                        <button type="submit" class="btn btn-primary btn-lg px-4" id="submitBtn">
+                                            <span class="btn-text">
+                                                <i class="bi bi-check-circle"></i> Thêm sinh viên
+                                            </span>
+                                            <span class="btn-spinner" style="display:none;">
+                                                <span class="spinner-border spinner-border-sm me-2"></span>
+                                                Đang xử lý...
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Help Card -->
+            <div class="card border-0 bg-light mt-4">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3">
+                        <i class="bi bi-question-circle text-primary"></i> Hướng dẫn
+                    </h6>
+                    <ul class="small text-muted mb-0">
+                        <li>Các trường có dấu (<span class="text-danger">*</span>) là bắt buộc phải nhập</li>
+                        <li>Email phải đúng định dạng (có chứa @@)</li>
+                        <li>Số điện thoại phải gồm 10-11 chữ số</li>
+                        <li>URL ảnh đại diện là tùy chọn, nếu không nhập sẽ hiển thị avatar mặc định</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function() {
+            let imageLoadTimeout;
+
+            // Image preview with loading state
+            $('#imgUrlInput').on('input', function() {
+                var url = $(this).val().trim();
+                
+                clearTimeout(imageLoadTimeout);
+                $('#imageError').hide();
+                $('#imagePreviewSection').hide();
+                
+                if (url && isValidUrl(url)) {
+                    $('#imageLoadingSpinner').show();
+                    $('#imagePreviewSection').show();
+                    
+                    imageLoadTimeout = setTimeout(function() {
+                        var img = new Image();
+                        img.onload = function() {
+                            $('#previewImg').attr('src', url);
+                            $('#imageLoadingSpinner').hide();
+                            $('#imageError').hide();
+                        };
+                        img.onerror = function() {
+                            $('#imagePreviewSection').hide();
+                            $('#imageError').show();
+                            $('#imageLoadingSpinner').hide();
+                        };
+                        img.src = url;
+                    }, 500);
+                }
+            });
+
+            function isValidUrl(string) {
+                try {
+                    new URL(string);
+                    return true;
+                } catch (_) {
+                    return false;
+                }
+            }
+
+            // Calculate and display age
+            $('#dateOfBirth').on('change', function() {
+                var dob = new Date($(this).val());
+                var today = new Date();
+                var age = today.getFullYear() - dob.getFullYear();
+                var monthDiff = today.getMonth() - dob.getMonth();
+                
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+                    age--;
+                }
+                
+                if (age >= 0) {
+                    $('#calculatedAge').text(age + ' tuổi');
+                    $('#ageDisplay').show();
+                    
+                    // Validation for reasonable age
+                    if (age < 16 || age > 100) {
+                        $('#ageDisplay').append(' <span class="text-warning"><i class="bi bi-exclamation-triangle"></i> Vui lòng kiểm tra lại</span>');
+                    }
+                } else {
+                    $('#ageDisplay').hide();
+                }
+                
+                updateProgress();
+            });
+
+            // Form progress tracking
+            function updateProgress() {
+                var totalFields = 6; // Required fields
+                var filledFields = 0;
+                
+                if ($('#Name').val().trim()) filledFields++;
+                if ($('#dateOfBirth').val()) filledFields++;
+                if ($('#Gender').val()) filledFields++;
+                if ($('#Email').val().trim()) filledFields++;
+                if ($('#PhoneNumber').val().trim()) filledFields++;
+                if ($('#Region').val().trim()) filledFields++;
+                
+                var progress = (filledFields / totalFields) * 100;
+                $('#formProgress').css('width', progress + '%');
+            }
+
+            // Track form changes
+            $('#createStudentForm input, #createStudentForm select').on('change input', function() {
+                updateProgress();
+            });
+
+            // Form validation enhancement
+            $('#createStudentForm').on('submit', function(e) {
+                e.preventDefault();
+                
+                if (!this.checkValidity()) {
+                    e.stopPropagation();
+                    $(this).addClass('was-validated');
+                    
+                    // Scroll to first error
+                    var firstError = $(this).find(':invalid').first();
+                    if (firstError.length) {
+                        $('html, body').animate({
+                            scrollTop: firstError.offset().top - 100
+                        }, 300);
+                        firstError.focus();
+                    }
+                    
+                    return false;
+                }
+                
+                // Show loading state
+                $('#submitBtn .btn-text').hide();
+                $('#submitBtn .btn-spinner').show();
+                $('#submitBtn').prop('disabled', true);
+                
+                // Submit form
+                this.submit();
+            });
+
+            // Reset button enhancement
+            $('#resetBtn').on('click', function(e) {
+                e.preventDefault();
+                if (confirm('Bạn có chắc chắn muốn xóa tất cả dữ liệu đã nhập?')) {
+                    $('#createStudentForm')[0].reset();
+                    $('#createStudentForm').removeClass('was-validated');
+                    $('#imagePreviewSection').hide();
+                    $('#imageError').hide();
+                    $('#ageDisplay').hide();
+                    $('#formProgress').css('width', '0%');
+                    $('#Name').focus();
+                }
+            });
+
+            // Auto-focus first field
+            $('#Name').focus();
+
+            // Prevent form submission on Enter (except for textarea)
+            $('#createStudentForm input').on('keypress', function(e) {
+                if (e.which === 13) {
+                    e.preventDefault();
+                    var inputs = $('#createStudentForm input, #createStudentForm select').filter(':visible');
+                    var nextIndex = inputs.index(this) + 1;
+                    if (nextIndex < inputs.length) {
+                        inputs.eq(nextIndex).focus();
+                    }
+                }
+            });
+
+            // Phone number formatting
+            $('#PhoneNumber').on('input', function() {
+                var value = $(this).val().replace(/\D/g, '');
+                $(this).val(value);
+            });
+
+            // Capitalize first letter of name
+            $('#Name').on('blur', function() {
+                var value = $(this).val();
+                if (value) {
+                    var capitalized = value.split(' ')
+                        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                        .join(' ');
+                    $(this).val(capitalized);
+                }
+            });
+        });
+    </script>
+}

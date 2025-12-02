@@ -1,0 +1,309 @@
+﻿@model student_management.Models.Student
+
+@{
+    ViewData["Title"] = "Xóa sinh viên";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var age = DateTime.Now.Year - Model.DateOfBirth.Year;
+    if (DateTime.Now.DayOfYear < Model.DateOfBirth.DayOfYear) age--;
+}
+
+<div class="container">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-action="Index"><i class="bi bi-house-door"></i> Danh sách sinh viên</a></li>
+                    <li class="breadcrumb-item"><a asp-action="Details" asp-route-id="@Model.Id">Chi tiết</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Xóa sinh viên</li>
+                </ol>
+            </nav>
+            <h1 class="display-6 fw-bold text-danger">
+                <i class="bi bi-exclamation-triangle-fill"></i> Xóa sinh viên
+            </h1>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-9 col-xl-8">
+            <!-- Warning Alert -->
+            <div class="alert alert-danger border-0 shadow-sm mb-4" role="alert">
+                <div class="d-flex align-items-start">
+                    <i class="bi bi-exclamation-triangle-fill fs-2 me-3"></i>
+                    <div class="flex-grow-1">
+                        <h5 class="alert-heading fw-bold mb-2">
+                            <i class="bi bi-shield-exclamation"></i> Cảnh báo quan trọng!
+                        </h5>
+                        <p class="mb-2">Bạn đang thực hiện hành động <strong>XÓA VĨNHviễn</strong> sinh viên khỏi hệ thống.</p>
+                        <ul class="mb-0 ps-3">
+                            <li>Tất cả thông tin của sinh viên sẽ bị xóa hoàn toàn</li>
+                            <li>Hành động này <strong>KHÔNG THỂ HOÀN TÁC</strong></li>
+                            <li>Vui lòng kiểm tra kỹ thông tin trước khi xác nhận</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Student Info Card -->
+            <div class="card shadow border-0">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-person-x"></i> Thông tin sinh viên sẽ bị xóa
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Student Avatar and Name -->
+                    <div class="text-center mb-4 pb-4 border-bottom">
+                        <div class="position-relative d-inline-block">
+                            @if (!string.IsNullOrEmpty(Model.ImgUrl))
+                            {
+                                <img src="@Model.ImgUrl" alt="@Model.Name" 
+                                     class="rounded-circle shadow mb-3" 
+                                     style="width: 120px; height: 120px; object-fit: cover; opacity: 0.7; filter: grayscale(100%);" 
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div class="student-detail-avatar-fallback rounded-circle shadow mx-auto mb-3" 
+                                     style="width: 120px; height: 120px; display:none; opacity: 0.7; filter: grayscale(100%);">
+                                    <span class="display-4">@(Model.Name?.FirstOrDefault().ToString().ToUpper() ?? "?")</span>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="student-detail-avatar-fallback rounded-circle shadow mx-auto mb-3" 
+                                     style="width: 120px; height: 120px; opacity: 0.7; filter: grayscale(100%);">
+                                    <span class="display-4">@(Model.Name?.FirstOrDefault().ToString().ToUpper() ?? "?")</span>
+                                </div>
+                            }
+                            <div class="position-absolute top-50 start-50 translate-middle">
+                                <i class="bi bi-x-circle-fill text-danger" style="font-size: 3rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);"></i>
+                            </div>
+                        </div>
+                        <h3 class="fw-bold text-danger mb-1">@Model.Name</h3>
+                        <p class="text-muted mb-0">
+                            <i class="bi bi-hash"></i> Mã sinh viên: <strong>#@Model.Id</strong>
+                        </p>
+                    </div>
+
+                    <!-- Student Details Summary -->
+                    <div class="card bg-light border-0 mb-4">
+                        <div class="card-body">
+                            <h6 class="fw-bold mb-3 text-danger">
+                                <i class="bi bi-info-circle"></i> Thông tin chi tiết sẽ bị xóa:
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="detail-item border">
+                                        <div class="detail-label">
+                                            <i class="bi bi-person text-danger me-2"></i>
+                                            @Html.DisplayNameFor(model => model.Name)
+                                        </div>
+                                        <div class="detail-value">
+                                            @Html.DisplayFor(model => model.Name)
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="detail-item border">
+                                        <div class="detail-label">
+                                            <i class="bi bi-calendar-event text-danger me-2"></i>
+                                            @Html.DisplayNameFor(model => model.DateOfBirth)
+                                        </div>
+                                        <div class="detail-value">
+                                            @Model.DateOfBirth.ToString("dd/MM/yyyy")
+                                            <span class="text-muted small">(@age tuổi)</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="detail-item border">
+                                        <div class="detail-label">
+                                            <i class="bi bi-gender-ambiguous text-danger me-2"></i>
+                                            @Html.DisplayNameFor(model => model.Gender)
+                                        </div>
+                                        <div class="detail-value">
+                                            @if (Model.Gender == 1)
+                                            {
+                                                <span class="badge bg-primary-subtle text-primary">
+                                                    <i class="bi bi-gender-male"></i> Nam
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger-subtle text-danger">
+                                                    <i class="bi bi-gender-female"></i> Nữ
+                                                </span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="detail-item border">
+                                        <div class="detail-label">
+                                            <i class="bi bi-geo-alt text-danger me-2"></i>
+                                            @Html.DisplayNameFor(model => model.Region)
+                                        </div>
+                                        <div class="detail-value">
+                                            @Html.DisplayFor(model => model.Region)
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="detail-item border">
+                                        <div class="detail-label">
+                                            <i class="bi bi-envelope text-danger me-2"></i>
+                                            @Html.DisplayNameFor(model => model.Email)
+                                        </div>
+                                        <div class="detail-value text-truncate">
+                                            @Html.DisplayFor(model => model.Email)
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="detail-item border">
+                                        <div class="detail-label">
+                                            <i class="bi bi-telephone text-danger me-2"></i>
+                                            @Html.DisplayNameFor(model => model.PhoneNumber)
+                                        </div>
+                                        <div class="detail-value">
+                                            @Html.DisplayFor(model => model.PhoneNumber)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Confirmation Form -->
+                    <form asp-action="Delete" id="deleteForm">
+                        <input type="hidden" asp-for="Id" />
+                        
+                        <!-- Confirmation Checkbox -->
+                        <div class="card border-danger mb-4">
+                            <div class="card-body">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="confirmCheck" required>
+                                    <label class="form-check-label fw-bold" for="confirmCheck">
+                                        <i class="bi bi-check-square text-danger me-2"></i>
+                                        Tôi hiểu rằng hành động này không thể hoàn tác và đồng ý xóa sinh viên <strong>"@Model.Name"</strong> khỏi hệ thống
+                                    </label>
+                                </div>
+                                <div class="form-text mt-2">
+                                    <i class="bi bi-info-circle"></i> Vui lòng đánh dấu vào ô này để kích hoạt nút xóa
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <hr class="my-4">
+                        <div class="d-flex flex-column flex-md-row gap-3 justify-content-between align-items-center">
+                            <div class="d-flex gap-3 order-md-1">
+                                <a asp-action="Index" class="btn btn-outline-secondary btn-lg px-4">
+                                    <i class="bi bi-arrow-left"></i> Quay lại danh sách
+                                </a>
+                                <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-info btn-lg px-4">
+                                    <i class="bi bi-eye"></i> Xem chi tiết
+                                </a>
+                            </div>
+                            <button type="submit" class="btn btn-danger btn-lg px-4 order-md-2" id="deleteBtn" disabled>
+                                <span class="btn-text">
+                                    <i class="bi bi-trash-fill"></i> Xác nhận xóa vĩnh viễn
+                                </span>
+                                <span class="btn-spinner" style="display:none;">
+                                    <span class="spinner-border spinner-border-sm me-2"></span>
+                                    Đang xóa...
+                                </span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Alternative Actions Card -->
+            <div class="card border-0 bg-light mt-4">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3">
+                        <i class="bi bi-lightbulb text-warning"></i> Các hành động thay thế
+                    </h6>
+                    <p class="text-muted small mb-3">
+                        Thay vì xóa, bạn có thể xem xét các tùy chọn sau:
+                    </p>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-warning">
+                            <i class="bi bi-pencil"></i> Chỉnh sửa thông tin
+                        </a>
+                        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-info">
+                            <i class="bi bi-eye"></i> Xem lại chi tiết
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Enable/disable delete button based on checkbox
+            $('#confirmCheck').on('change', function() {
+                $('#deleteBtn').prop('disabled', !this.checked);
+                
+                if (this.checked) {
+                    $('#deleteBtn').addClass('btn-danger-pulse');
+                } else {
+                    $('#deleteBtn').removeClass('btn-danger-pulse');
+                }
+            });
+
+            // Final confirmation before submit
+            $('#deleteForm').on('submit', function(e) {
+                e.preventDefault();
+                
+                if (!$('#confirmCheck').is(':checked')) {
+                    alert('Vui lòng xác nhận bằng cách đánh dấu vào ô checkbox.');
+                    return false;
+                }
+                
+                // Show custom confirmation dialog
+                var studentName = '@Model.Name';
+                var confirmMessage = 'LẦN XÁC NHẬN CUỐI CÙNG!\n\n' +
+                                   'Bạn có HOÀN TOÀN CHẮC CHẮN muốn xóa sinh viên "' + studentName + '" không?\n\n' +
+                                   'Hành động này KHÔNG THỂ HOÀN TÁC!\n\n' +
+                                   'Nhấn OK để xóa, hoặc Hủy để giữ lại.';
+                
+                if (confirm(confirmMessage)) {
+                    // Show loading state
+                    $('#deleteBtn .btn-text').hide();
+                    $('#deleteBtn .btn-spinner').show();
+                    $('#deleteBtn').prop('disabled', true);
+                    $('#confirmCheck').prop('disabled', true);
+                    
+                    // Disable all buttons
+                    $('button, a').addClass('disabled').prop('disabled', true);
+                    
+                    this.submit();
+                } else {
+                    // User cancelled
+                    $('#confirmCheck').prop('checked', false).trigger('change');
+                }
+            });
+
+            // Add visual warning animation
+            setInterval(function() {
+                $('.card-header.bg-danger').toggleClass('pulse-danger');
+            }, 1000);
+
+            // Warn before leaving page
+            window.addEventListener('beforeunload', function(e) {
+                // Don't show warning if form is being submitted
+                if ($('#deleteBtn .btn-spinner').is(':visible')) {
+                    return undefined;
+                }
+            });
+        });
+    </script>
+}

@@ -1,0 +1,19 @@
+﻿{
+  "AzureAd": {
+    "Instance": "https://login.microsoftonline.com/",
+    "Domain": "dainam.edu.vn",
+    "TenantId": "49a2d5e7-8131-4ba1-b10b-c2c86b7d8b35",
+    "ClientId": "40b90ca6-7ca0-4ada-a9e7-df316a93ef95",
+    "CallbackPath": "/signin-oidc"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "student_managementContext": "Server=localhost,1433;Database=StudentDB;User Id=SA;Password=123456@Aa;TrustServerCertificate=True;MultipleActiveResultSets=true"
+  }
+}

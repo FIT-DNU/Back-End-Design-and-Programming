@@ -1,0 +1,173 @@
+﻿# Hệ thống xác thực đã được chuyển đổi
+
+## Thay đổi chính
+
+Hệ thống đã được chuyển đổi từ **Microsoft Identity (Azure AD)** sang **xác thực đơn giản bằng Database và Cookie**.
+
+## Cấu trúc xác thực mới
+
+### 1. Models
+- **User.cs**: Model cho người dùng
+- **AccountViewModels.cs**: ViewModels cho Login và Register
+
+### 2. Controller
+- **AccountController.cs**: Xử lý đăng nhập, đăng ký, đăng xuất
+
+### 3. Views
+- **Login.cshtml**: Trang đăng nhập
+- **Register.cshtml**: Trang đăng ký
+- **AccessDenied.cshtml**: Trang từ chối truy cập
+- **_LayoutAuth.cshtml**: Layout riêng cho trang authentication (đẹp hơn, không có sidebar/header)
+
+### 4. Styles
+- **auth.css**: CSS riêng cho authentication pages với:
+  - Gradient background đẹp mắt
+  - Responsive design
+  - Animation effects
+  - Split layout (brand + form)
+
+### 5. Authentication
+- Sử dụng **Cookie Authentication** thay vì OpenID Connect
+- Mật khẩu được hash bằng SHA256
+- Session timeout: 8 giờ (có thể kéo dài nếu chọn "Ghi nhớ đăng nhập")
+
+## Đặc điểm Layout Authentication
+
+### Desktop View (>992px)
+- Split screen: Brand section (trái) + Form (phải)
+- Brand section có:
+  - Logo và tên hệ thống
+  - 3 features nổi bật
+  - Animated background shapes
+  - Gradient purple theme
+
+### Mobile View (<992px)
+- Chỉ hiển thị form
+- Brand section ẩn đi để tối ưu không gian
+- Form đầy màn hình với padding phù hợp
+
+## Tài khoản mặc định
+
+Để tạo tài khoản admin mặc định, chạy script `SeedAdminUser.sql`:
+
+```sql
+Username: admin
+Password: admin123
+Email: admin@student.edu.vn
+Role: Admin
+```
+
+Hoặc chạy script sau trong SQL Server Management Studio:
+
+```bash
+sqlcmd -S localhost,1433 -U SA -P "123456@Aa" -i SeedAdminUser.sql
+```
+
+## Cách sử dụng
+
+### Đăng ký tài khoản mới
+1. Truy cập `/Account/Register`
+2. Điền thông tin: Tên đăng nhập, Email, Họ tên, Mật khẩu
+3. Nhấn "Đăng ký"
+
+### Đăng nhập
+1. Truy cập `/Account/Login`
+2. Nhập tên đăng nhập và mật khẩu
+3. Tùy chọn: Chọn "Ghi nhớ đăng nhập" để session kéo dài 30 ngày
+4. Nhấn "Đăng nhập"
+
+### Đăng xuất
+- Nhấn nút "Đăng xuất" trên thanh menu (khi đã đăng nhập)
+
+## Bảo mật
+
+- Mật khẩu được hash bằng SHA256 trước khi lưu vào database
+- Cookie được cấu hình với:
+  - HttpOnly = true
+  - Secure = true (chỉ hoạt động trên HTTPS)
+  - SameSite = Strict
+- Tất cả các trang đều yêu cầu xác thực (trừ Login, Register, AccessDenied)
+
+## Migrations
+
+Migration đã được tạo và áp dụng:
+- **AddUserAuthentication**: Thêm bảng User vào database
+
+Nếu cần chạy lại migration:
+```bash
+dotnet ef database update
+```
+
+## Packages đã xóa
+
+Các package Microsoft Identity sau đã được xóa khỏi project:
+- Microsoft.Identity.Web
+- Microsoft.Identity.Web.UI
+- Microsoft.Identity.Web.DownstreamApi
+- Microsoft.AspNetCore.Authentication.OpenIdConnect
+- Microsoft.AspNetCore.Authentication.JwtBearer
+
+## UI/UX Features
+
+### Authentication Pages
+- ✨ Gradient purple background
+- 🎨 Modern split-screen design
+- 📱 Fully responsive
+- 🌊 Smooth animations
+- 🎯 User-friendly form validation
+- 💫 Floating shape animations
+
+### Main Layout
+- Sidebar navigation với icons
+- User dropdown menu
+- Notification dropdown
+- Real-time date display
+- Responsive mobile menu
+
+## Lưu ý
+
+1. **Mật khẩu mặc định**: Sau khi tạo tài khoản admin, nên đổi mật khẩu ngay
+2. **Bảo mật nâng cao**: Nếu muốn bảo mật cao hơn, hãy xem xét sử dụng bcrypt hoặc PBKDF2 thay vì SHA256
+3. **Email verification**: Hiện tại chưa có xác thực email, có thể thêm sau nếu cần
+4. **HTTPS**: Đảm bảo chạy trên HTTPS trong production để cookie hoạt động an toàn
+
+## Troubleshooting
+
+### Không đăng nhập được
+- Kiểm tra database đã có bảng User chưa
+- Kiểm tra username và password có đúng không
+- Kiểm tra user.IsActive = true
+
+### Migration error
+```bash
+dotnet ef migrations remove
+dotnet ef migrations add AddUserAuthentication
+dotnet ef database update
+```
+
+### Cookie không hoạt động
+- Đảm bảo đang chạy trên HTTPS
+- Kiểm tra browser không block cookies
+
+### Layout không hiển thị đúng
+- Clear browser cache
+- Kiểm tra file auth.css đã được load chưa
+- Kiểm tra Console trong DevTools xem có lỗi CSS không
+
+## Screenshots
+
+### Login Page
+- Split screen với brand section và form
+- Purple gradient background
+- Animated floating shapes
+
+### Register Page
+- Tương tự Login nhưng với nhiều fields hơn
+- Form validation real-time
+- Success message sau khi đăng ký
+
+### Main Dashboard
+- Sidebar navigation
+- User profile dropdown
+- Notification center
+- Responsive design

@@ -1,0 +1,40 @@
+﻿@model IEnumerable<student_management.Models.Student>
+
+@{
+    ViewData["Title"] = "Trang chủ";
+}
+
+<div class="container py-5">
+    <div class="row align-items-center min-vh-50">
+        <div class="col-md-12 text-center">
+
+            <div class="row justify-content-center mb-5">
+                @await Component.InvokeAsync("StudentStats", new { students = Model })
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .min-vh-50 {
+        min-height: 50vh;
+    }
+
+    /* Hover hiệu ứng cho card */
+    .hover-shadow:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        transition: all 0.3s ease;
+    }
+
+    /* Background gradient nhẹ */
+    body {
+        background: linear-gradient(to right, #f8f9fa, #e9ecef);
+    }
+
+    /* Feature card hover */
+    .feature-card:hover {
+        background-color: #f1f3f5;
+        transition: background-color 0.3s ease;
+    }
+</style>

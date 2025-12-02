@@ -1,0 +1,93 @@
+﻿@model student_management.Models.Class
+
+@{
+    ViewData["Title"] = "Chỉnh sửa lớp học";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a asp-action="Index">
+                            <i class="bi bi-house-door"></i> Danh sách lớp học
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a asp-action="Details" asp-route-id="@Model.Id">Chi tiết</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Chỉnh sửa</li>
+                </ol>
+            </nav>
+
+            <h1 class="display-6 fw-bold text-warning">
+                <i class="bi bi-pencil-square"></i> Chỉnh sửa lớp học
+            </h1>
+            <p class="text-muted">Cập nhật thông tin cho: <strong class="text-dark">@Model.Name</strong></p>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="bi bi-clipboard-data"></i> Thông tin lớp học
+                    </h5>
+                </div>
+
+                <div class="card-body p-4">
+                    <form asp-action="Edit" id="editClassForm">
+                        <input type="hidden" asp-for="Id" />
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label asp-for="Name" class="form-label fw-bold">
+                                    <i class="bi bi-building text-warning"></i> @Html.DisplayNameFor(model => model.Name)
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Name" class="form-control form-control-lg" placeholder="Nhập tên lớp học" required />
+                                <span asp-validation-for="Name" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label asp-for="Description" class="form-label fw-bold">
+                                    <i class="bi bi-card-text text-warning"></i> @Html.DisplayNameFor(model => model.Description)
+                                </label>
+                                <textarea asp-for="Description" class="form-control" rows="4" placeholder="Nhập mô tả về lớp học (không bắt buộc)"></textarea>
+                                <span asp-validation-for="Description" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex gap-2 justify-content-between flex-wrap">
+                            <div class="d-flex gap-2">
+                                <a asp-action="Index" class="btn btn-outline-secondary btn-lg px-4">
+                                    <i class="bi bi-arrow-left"></i> Quay lại danh sách
+                                </a>
+                                <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-info btn-lg px-4">
+                                    <i class="bi bi-eye"></i> Xem chi tiết
+                                </a>
+                            </div>
+
+                            <button type="submit" class="btn btn-warning btn-lg px-4">
+                                <i class="bi bi-save"></i> Cập nhật
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "identityapp1": {
+      "connectionInfo": "App registration: hoangnth, Tenant: Dai Nam University (dainam.edu.vn - Microsoft Entra ID)",
+      "type": "identityapp.default"
+    },
+    "mssql1": {
+      "type": "mssql.local",
+      "connectionId": "ConnectionStrings:student_managementContext"
+    }
+  }
+}

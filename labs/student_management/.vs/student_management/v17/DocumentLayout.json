@@ -1,0 +1,190 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\nguye\\source\\repos\\student_management\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{1246A064-8959-4CFF-9AB8-7CA97AA22788}|student_management\\student_management.csproj|c:\\users\\nguye\\source\\repos\\student_management\\student_management\\views\\account\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{1246A064-8959-4CFF-9AB8-7CA97AA22788}|student_management\\student_management.csproj|solutionrelative:student_management\\views\\account\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1246A064-8959-4CFF-9AB8-7CA97AA22788}|student_management\\student_management.csproj|c:\\users\\nguye\\source\\repos\\student_management\\student_management\\views\\account\\accessdenied.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{1246A064-8959-4CFF-9AB8-7CA97AA22788}|student_management\\student_management.csproj|solutionrelative:student_management\\views\\account\\accessdenied.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1246A064-8959-4CFF-9AB8-7CA97AA22788}|student_management\\student_management.csproj|c:\\users\\nguye\\source\\repos\\student_management\\student_management\\models\\accountviewmodels.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1246A064-8959-4CFF-9AB8-7CA97AA22788}|student_management\\student_management.csproj|solutionrelative:student_management\\models\\accountviewmodels.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1246A064-8959-4CFF-9AB8-7CA97AA22788}|student_management\\student_management.csproj|c:\\users\\nguye\\source\\repos\\student_management\\student_management\\models\\class.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1246A064-8959-4CFF-9AB8-7CA97AA22788}|student_management\\student_management.csproj|solutionrelative:student_management\\models\\class.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1246A064-8959-4CFF-9AB8-7CA97AA22788}|student_management\\student_management.csproj|c:\\users\\nguye\\source\\repos\\student_management\\student_management\\wwwroot\\js\\site.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{1246A064-8959-4CFF-9AB8-7CA97AA22788}|student_management\\student_management.csproj|solutionrelative:student_management\\wwwroot\\js\\site.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1246A064-8959-4CFF-9AB8-7CA97AA22788}|student_management\\student_management.csproj|c:\\users\\nguye\\source\\repos\\student_management\\student_management\\wwwroot\\js\\students-list.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{1246A064-8959-4CFF-9AB8-7CA97AA22788}|student_management\\student_management.csproj|solutionrelative:student_management\\wwwroot\\js\\students-list.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1246A064-8959-4CFF-9AB8-7CA97AA22788}|student_management\\student_management.csproj|c:\\users\\nguye\\source\\repos\\student_management\\student_management\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1246A064-8959-4CFF-9AB8-7CA97AA22788}|student_management\\student_management.csproj|solutionrelative:student_management\\controllers\\accountcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1246A064-8959-4CFF-9AB8-7CA97AA22788}|student_management\\student_management.csproj|c:\\users\\nguye\\source\\repos\\student_management\\student_management\\models\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1246A064-8959-4CFF-9AB8-7CA97AA22788}|student_management\\student_management.csproj|solutionrelative:student_management\\models\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1246A064-8959-4CFF-9AB8-7CA97AA22788}|student_management\\student_management.csproj|c:\\users\\nguye\\source\\repos\\student_management\\student_management\\views\\students\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{1246A064-8959-4CFF-9AB8-7CA97AA22788}|student_management\\student_management.csproj|solutionrelative:student_management\\views\\students\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1246A064-8959-4CFF-9AB8-7CA97AA22788}|student_management\\student_management.csproj|c:\\users\\nguye\\source\\repos\\student_management\\student_management\\views\\_viewstart.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{1246A064-8959-4CFF-9AB8-7CA97AA22788}|student_management\\student_management.csproj|solutionrelative:student_management\\views\\_viewstart.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 7,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "AccessDenied.cshtml",
+              "DocumentMoniker": "C:\\Users\\nguye\\source\\repos\\student_management\\student_management\\Views\\Account\\AccessDenied.cshtml",
+              "RelativeDocumentMoniker": "student_management\\Views\\Account\\AccessDenied.cshtml",
+              "ToolTip": "C:\\Users\\nguye\\source\\repos\\student_management\\student_management\\Views\\Account\\AccessDenied.cshtml",
+              "RelativeToolTip": "student_management\\Views\\Account\\AccessDenied.cshtml",
+              "ViewState": "AgIAABIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-12-02T03:47:13.572Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "AccountViewModels.cs",
+              "DocumentMoniker": "C:\\Users\\nguye\\source\\repos\\student_management\\student_management\\Models\\AccountViewModels.cs",
+              "RelativeDocumentMoniker": "student_management\\Models\\AccountViewModels.cs",
+              "ToolTip": "C:\\Users\\nguye\\source\\repos\\student_management\\student_management\\Models\\AccountViewModels.cs",
+              "RelativeToolTip": "student_management\\Models\\AccountViewModels.cs",
+              "ViewState": "AgIAAA0AAAAAAAAAAAAgwCEAAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-02T03:46:37.457Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Class.cs",
+              "DocumentMoniker": "C:\\Users\\nguye\\source\\repos\\student_management\\student_management\\Models\\Class.cs",
+              "RelativeDocumentMoniker": "student_management\\Models\\Class.cs",
+              "ToolTip": "C:\\Users\\nguye\\source\\repos\\student_management\\student_management\\Models\\Class.cs",
+              "RelativeToolTip": "student_management\\Models\\Class.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-02T03:46:36.811Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "site.js",
+              "DocumentMoniker": "C:\\Users\\nguye\\source\\repos\\student_management\\student_management\\wwwroot\\js\\site.js",
+              "RelativeDocumentMoniker": "student_management\\wwwroot\\js\\site.js",
+              "ToolTip": "C:\\Users\\nguye\\source\\repos\\student_management\\student_management\\wwwroot\\js\\site.js",
+              "RelativeToolTip": "student_management\\wwwroot\\js\\site.js",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-12-02T03:46:35.441Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "students-list.js",
+              "DocumentMoniker": "C:\\Users\\nguye\\source\\repos\\student_management\\student_management\\wwwroot\\js\\students-list.js",
+              "RelativeDocumentMoniker": "student_management\\wwwroot\\js\\students-list.js",
+              "ToolTip": "C:\\Users\\nguye\\source\\repos\\student_management\\student_management\\wwwroot\\js\\students-list.js",
+              "RelativeToolTip": "student_management\\wwwroot\\js\\students-list.js",
+              "ViewState": "AgIAADwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-12-02T03:46:32.301Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "AccountController.cs",
+              "DocumentMoniker": "C:\\Users\\nguye\\source\\repos\\student_management\\student_management\\Controllers\\AccountController.cs",
+              "RelativeDocumentMoniker": "student_management\\Controllers\\AccountController.cs",
+              "ToolTip": "C:\\Users\\nguye\\source\\repos\\student_management\\student_management\\Controllers\\AccountController.cs",
+              "RelativeToolTip": "student_management\\Controllers\\AccountController.cs",
+              "ViewState": "AgIAAFoAAAAAAAAAAAAAAFgAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-02T03:45:54.724Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "User.cs",
+              "DocumentMoniker": "C:\\Users\\nguye\\source\\repos\\student_management\\student_management\\Models\\User.cs",
+              "RelativeDocumentMoniker": "student_management\\Models\\User.cs",
+              "ToolTip": "C:\\Users\\nguye\\source\\repos\\student_management\\student_management\\Models\\User.cs",
+              "RelativeToolTip": "student_management\\Models\\User.cs",
+              "ViewState": "AgIAABoAAAAAAAAAAAAIwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-02T03:45:15.291Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Login.cshtml",
+              "DocumentMoniker": "C:\\Users\\nguye\\source\\repos\\student_management\\student_management\\Views\\Account\\Login.cshtml",
+              "RelativeDocumentMoniker": "student_management\\Views\\Account\\Login.cshtml",
+              "ToolTip": "C:\\Users\\nguye\\source\\repos\\student_management\\student_management\\Views\\Account\\Login.cshtml",
+              "RelativeToolTip": "student_management\\Views\\Account\\Login.cshtml",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAABoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-12-02T03:45:10.775Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Create.cshtml",
+              "DocumentMoniker": "C:\\Users\\nguye\\source\\repos\\student_management\\student_management\\Views\\Students\\Create.cshtml",
+              "RelativeDocumentMoniker": "student_management\\Views\\Students\\Create.cshtml",
+              "ToolTip": "C:\\Users\\nguye\\source\\repos\\student_management\\student_management\\Views\\Students\\Create.cshtml",
+              "RelativeToolTip": "student_management\\Views\\Students\\Create.cshtml",
+              "ViewState": "AgIAACoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-12-02T03:45:05.099Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "_ViewStart.cshtml",
+              "DocumentMoniker": "C:\\Users\\nguye\\source\\repos\\student_management\\student_management\\Views\\_ViewStart.cshtml",
+              "RelativeDocumentMoniker": "student_management\\Views\\_ViewStart.cshtml",
+              "ToolTip": "C:\\Users\\nguye\\source\\repos\\student_management\\student_management\\Views\\_ViewStart.cshtml",
+              "RelativeToolTip": "student_management\\Views\\_ViewStart.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-12-02T03:45:03.966Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

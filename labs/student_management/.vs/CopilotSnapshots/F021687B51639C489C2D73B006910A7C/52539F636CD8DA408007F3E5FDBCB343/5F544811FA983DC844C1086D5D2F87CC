@@ -1,0 +1,39 @@
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace student_management.Models
+{
+    [Table("student")]
+    public class Student
+    {
+        [Column("id")]
+        public int Id { get; set; }
+
+        [Column("class_id")]
+        public int ClassID { get; set; }
+
+        [Column("name")]
+        public string Name { get; set; }
+
+        [Column("date_of_birth")]
+        public DateTime DateOfBirth { get; set; }
+
+        [Column("img_url")]
+        public string ImgUrl { get; set; }
+
+        [Column("gender")]
+        public int Gender { get; set; }
+
+        [Column("email")]
+        public string Email { get; set; }
+
+        [Column("phone_number")]
+        public string PhoneNumber { get; set; }
+
+        [Column("region")]
+        public string Region { get; set; }
+
+        public Class Class { get; set; } = null!;
+    }
+}

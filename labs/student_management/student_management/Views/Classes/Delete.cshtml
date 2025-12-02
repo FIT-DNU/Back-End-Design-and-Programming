@@ -1,0 +1,246 @@
+@model student_management.Models.Class
+
+@{
+    ViewData["Title"] = "Xóa l?p h?c";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-action="Index"><i class="bi bi-house-door"></i> Danh sách l?p h?c</a></li>
+                    <li class="breadcrumb-item"><a asp-action="Details" asp-route-id="@Model.Id">Chi ti?t</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Xóa l?p h?c</li>
+                </ol>
+            </nav>
+            <h1 class="display-6 fw-bold text-danger">
+                <i class="bi bi-exclamation-triangle-fill"></i> Xóa l?p h?c
+            </h1>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-9 col-xl-8">
+            <div class="alert alert-danger border-0 shadow-sm mb-4" role="alert">
+                <div class="d-flex align-items-start">
+                    <i class="bi bi-exclamation-triangle-fill fs-2 me-3"></i>
+                    <div class="flex-grow-1">
+                        <h5 class="alert-heading fw-bold mb-2">
+                            <i class="bi bi-shield-exclamation"></i> C?nh báo quan tr?ng!
+                        </h5>
+                        <p class="mb-2">B?n ðang th?c hi?n hành ð?ng <strong>XÓA V?NH VI?N</strong> l?p h?c kh?i h? th?ng.</p>
+                        <ul class="mb-0 ps-3">
+                            <li>T?t c? thông tin c?a l?p h?c s? b? xóa hoàn toàn</li>
+                            <li>Hành ð?ng này <strong>KHÔNG TH? HOÀN TÁC</strong></li>
+                            @if (Model.Students.Any())
+                            {
+                                <li class="text-warning fw-bold">
+                                    <i class="bi bi-exclamation-triangle"></i> Lýu ?: L?p này c?n <strong>@Model.Students.Count sinh viên</strong>. 
+                                    Sinh viên s? không b? xóa nhýng s? m?t liên k?t v?i l?p!
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow border-0">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-building-x"></i> Thông tin l?p h?c s? b? xóa
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="text-center mb-4 pb-4 border-bottom">
+                        <div class="display-1 text-danger mb-3">
+                            <i class="bi bi-building-fill-x"></i>
+                        </div>
+                        <h3 class="fw-bold text-danger mb-1">@Model.Name</h3>
+                        <p class="text-muted mb-0">
+                            <i class="bi bi-hash"></i> M? l?p: <strong>#@Model.Id</strong>
+                        </p>
+                    </div>
+
+                    <div class="card bg-light border-0 mb-4">
+                        <div class="card-body">
+                            <h6 class="fw-bold mb-3 text-danger">
+                                <i class="bi bi-info-circle"></i> Thông tin chi ti?t s? b? xóa:
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="detail-item border">
+                                        <div class="detail-label">
+                                            <i class="bi bi-building text-danger me-2"></i>
+                                            @Html.DisplayNameFor(model => model.Name)
+                                        </div>
+                                        <div class="detail-value">
+                                            @Html.DisplayFor(model => model.Name)
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="detail-item border">
+                                        <div class="detail-label">
+                                            <i class="bi bi-people text-danger me-2"></i>
+                                            S? sinh viên
+                                        </div>
+                                        <div class="detail-value">
+                                            <span class="badge bg-primary fs-6">@Model.Students.Count sinh viên</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="detail-item border">
+                                        <div class="detail-label">
+                                            <i class="bi bi-card-text text-danger me-2"></i>
+                                            @Html.DisplayNameFor(model => model.Description)
+                                        </div>
+                                        <div class="detail-value">
+                                            @if (!string.IsNullOrEmpty(Model.Description))
+                                            {
+                                                @Html.DisplayFor(model => model.Description)
+                                            }
+                                            else
+                                            {
+                                                <em class="text-muted">Chýa có mô t?</em>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (Model.Students.Any())
+                    {
+                        <div class="alert alert-warning border-warning mb-4">
+                            <h6 class="alert-heading fw-bold">
+                                <i class="bi bi-exclamation-triangle"></i> Sinh viên trong l?p
+                            </h6>
+                            <p class="small mb-2">L?p này hi?n có <strong>@Model.Students.Count sinh viên</strong>:</p>
+                            <div class="list-group list-group-flush" style="max-height: 200px; overflow-y: auto;">
+                                @foreach (var student in Model.Students.Take(10))
+                                {
+                                    <div class="list-group-item list-group-item-warning px-0 py-1 border-0">
+                                        <small><i class="bi bi-person-fill"></i> @student.Name</small>
+                                    </div>
+                                }
+                                @if (Model.Students.Count > 10)
+                                {
+                                    <div class="list-group-item list-group-item-warning px-0 py-1 border-0">
+                                        <small><em>... và @(Model.Students.Count - 10) sinh viên khác</em></small>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    <form asp-action="Delete" id="deleteForm">
+                        <input type="hidden" asp-for="Id" />
+                        
+                        <div class="card border-danger mb-4">
+                            <div class="card-body">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="confirmCheck" required>
+                                    <label class="form-check-label fw-bold" for="confirmCheck">
+                                        <i class="bi bi-check-square text-danger me-2"></i>
+                                        Tôi hi?u r?ng hành ð?ng này không th? hoàn tác và ð?ng ? xóa l?p h?c <strong>"@Model.Name"</strong> kh?i h? th?ng
+                                    </label>
+                                </div>
+                                <div class="form-text mt-2">
+                                    <i class="bi bi-info-circle"></i> Vui l?ng ðánh d?u vào ô này ð? kích ho?t nút xóa
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+                        <div class="d-flex flex-column flex-md-row gap-3 justify-content-between align-items-center">
+                            <div class="d-flex gap-3 order-md-1">
+                                <a asp-action="Index" class="btn btn-outline-secondary btn-lg px-4">
+                                    <i class="bi bi-arrow-left"></i> Quay l?i danh sách
+                                </a>
+                                <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-info btn-lg px-4">
+                                    <i class="bi bi-eye"></i> Xem chi ti?t
+                                </a>
+                            </div>
+                            <button type="submit" class="btn btn-danger btn-lg px-4 order-md-2" id="deleteBtn" disabled>
+                                <span class="btn-text">
+                                    <i class="bi bi-trash-fill"></i> Xác nh?n xóa v?nh vi?n
+                                </span>
+                                <span class="btn-spinner" style="display:none;">
+                                    <span class="spinner-border spinner-border-sm me-2"></span>
+                                    Ðang xóa...
+                                </span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card border-0 bg-light mt-4">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3">
+                        <i class="bi bi-lightbulb text-warning"></i> Các hành ð?ng thay th?
+                    </h6>
+                    <p class="text-muted small mb-3">
+                        Thay v? xóa, b?n có th? xem xét các tùy ch?n sau:
+                    </p>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-warning">
+                            <i class="bi bi-pencil"></i> Ch?nh s?a thông tin
+                        </a>
+                        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-info">
+                            <i class="bi bi-eye"></i> Xem l?i chi ti?t
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#confirmCheck').on('change', function() {
+                $('#deleteBtn').prop('disabled', !this.checked);
+            });
+
+            $('#deleteForm').on('submit', function(e) {
+                e.preventDefault();
+                
+                if (!$('#confirmCheck').is(':checked')) {
+                    alert('Vui l?ng xác nh?n b?ng cách ðánh d?u vào ô checkbox.');
+                    return false;
+                }
+                
+                var className = '@Model.Name';
+                var studentCount = @Model.Students.Count;
+                var warningMessage = studentCount > 0 
+                    ? '\n\nC?NH BÁO: L?p này c?n ' + studentCount + ' sinh viên!'
+                    : '';
+                    
+                var confirmMessage = 'L?N XÁC NH?N CU?I CÙNG!\n\n' +
+                                   'B?n có HOÀN TOÀN CH?C CH?N mu?n xóa l?p "' + className + '" không?' +
+                                   warningMessage + '\n\n' +
+                                   'Hành ð?ng này KHÔNG TH? HOÀN TÁC!\n\n' +
+                                   'Nh?n OK ð? xóa, ho?c H?y ð? gi? l?i.';
+                
+                if (confirm(confirmMessage)) {
+                    $('#deleteBtn .btn-text').hide();
+                    $('#deleteBtn .btn-spinner').show();
+                    $('#deleteBtn').prop('disabled', true);
+                    $('#confirmCheck').prop('disabled', true);
+                    
+                    this.submit();
+                } else {
+                    $('#confirmCheck').prop('checked', false).trigger('change');
+                }
+            });
+        });
+    </script>
+}

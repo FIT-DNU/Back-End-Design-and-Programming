@@ -1,0 +1,107 @@
+﻿@{
+    ViewData["Title"] = "Trang chủ";
+}
+
+<div class="container">
+    <div class="row align-items-center min-vh-50">
+        <div class="col-md-12 text-center">
+            <div class="mb-5">
+                <i class="bi bi-mortarboard-fill text-primary" style="font-size: 6rem;"></i>
+            </div>
+            <h1 class="display-3 fw-bold mb-3">
+                Xin chào
+            </h1>
+            <p class="lead text-muted mb-4">
+                Chào mừng tới thế giới lập trình BE
+            </p>
+            
+            <div class="row justify-content-center mt-5">
+                <div class="col-md-8">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="card shadow-sm border-0 h-100">
+                                <div class="card-body text-center p-4">
+                                    <div class="mb-3">
+                                        <i class="bi bi-people-fill text-primary" style="font-size: 3rem;"></i>
+                                    </div>
+                                    <h4 class="fw-bold mb-3">Quản lý sinh viên</h4>
+                                    <p class="text-muted mb-4">
+                                        Thêm, sửa, xóa và xem thông tin sinh viên một cách dễ dàng
+                                    </p>
+                                    <a asp-controller="Students" asp-action="Index" class="btn btn-primary btn-lg">
+                                        <i class="bi bi-arrow-right-circle"></i> Xem danh sách
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card shadow-sm border-0 h-100">
+                                <div class="card-body text-center p-4">
+                                    <div class="mb-3">
+                                        <i class="bi bi-person-plus-fill text-success" style="font-size: 3rem;"></i>
+                                    </div>
+                                    <h4 class="fw-bold mb-3">Thêm sinh viên mới</h4>
+                                    <p class="text-muted mb-4">
+                                        Nhanh chóng thêm sinh viên mới vào hệ thống
+                                    </p>
+                                    <a asp-controller="Students" asp-action="Create" class="btn btn-success btn-lg">
+                                        <i class="bi bi-plus-circle"></i> Thêm ngay
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features Section -->
+            <div class="row justify-content-center mt-5">
+                <div class="col-md-10">
+                    <hr class="my-5">
+                    <h3 class="fw-bold mb-4">Tính năng nổi bật</h3>
+                    <div class="row g-4 text-start">
+                        <div class="col-md-4">
+                            <div class="d-flex">
+                                <div class="me-3">
+                                    <i class="bi bi-search text-primary fs-3"></i>
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold">Tìm kiếm thông minh</h5>
+                                    <p class="text-muted mb-0">Tìm kiếm sinh viên theo tên, email, số điện thoại</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex">
+                                <div class="me-3">
+                                    <i class="bi bi-funnel text-primary fs-3"></i>
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold">Lọc dữ liệu</h5>
+                                    <p class="text-muted mb-0">Lọc theo giới tính và khu vực</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex">
+                                <div class="me-3">
+                                    <i class="bi bi-phone text-primary fs-3"></i>
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold">Responsive Design</h5>
+                                    <p class="text-muted mb-0">Giao diện thân thiện trên mọi thiết bị</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .min-vh-50 {
+        min-height: 50vh;
+    }
+</style>

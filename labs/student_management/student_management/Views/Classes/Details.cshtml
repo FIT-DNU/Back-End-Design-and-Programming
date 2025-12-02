@@ -1,0 +1,201 @@
+﻿@model student_management.Models.Class
+
+@{
+    ViewData["Title"] = "Chi tiết lớp học";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-action="Index"><i class="bi bi-house-door"></i> Danh sách lớp học</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Chi tiết</li>
+                </ol>
+            </nav>
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <h1 class="display-6 fw-bold text-primary mb-1">
+                        <i class="bi bi-building"></i> @Model.Name
+                    </h1>
+                    <p class="text-muted mb-0">
+                        <i class="bi bi-info-circle"></i> Thông tin chi tiết lớp học
+                    </p>
+                </div>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                        <i class="bi bi-pencil"></i>
+                        <span class="d-none d-md-inline ms-1">Chỉnh sửa</span>
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">
+                        <i class="bi bi-trash"></i>
+                        <span class="d-none d-md-inline ms-1">Xóa</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Thông tin cơ bản -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle"></i> Thông tin cơ bản
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <div class="detail-label">
+                            <i class="bi bi-building text-primary me-2"></i>
+                            @Html.DisplayNameFor(model => model.Name)
+                        </div>
+                        <div class="detail-value fs-4 fw-bold">
+                            @Html.DisplayFor(model => model.Name)
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="detail-label">
+                            <i class="bi bi-card-text text-primary me-2"></i>
+                            @Html.DisplayNameFor(model => model.Description)
+                        </div>
+                        <div class="detail-value">
+                            @if (!string.IsNullOrEmpty(Model.Description))
+                            {
+                                @Html.DisplayFor(model => model.Description)
+                            }
+                            else
+                            {
+                                <em class="text-muted">Chưa có mô tả</em>
+                            }
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="text-center p-3 bg-light rounded">
+                        <div class="text-muted small mb-1">Số lượng sinh viên</div>
+                        <div class="fs-1 fw-bold text-primary">@Model.Students.Count</div>
+                        <div class="text-muted small">sinh viên</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Danh sách sinh viên -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-people-fill"></i> Danh sách sinh viên (@Model.Students.Count)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.Students.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Họ và tên</th>
+                                        <th>Giới tính</th>
+                                        <th>Email</th>
+                                        <th>Số điện thoại</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var student in Model.Students.OrderBy(s => s.Name))
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    @if (!string.IsNullOrEmpty(student.ImgUrl))
+                                                    {
+                                                        <img src="@student.ImgUrl" alt="@student.Name"
+                                                             class="rounded-circle me-2"
+                                                             style="width: 32px; height: 32px; object-fit: cover;"
+                                                             onerror="this.style.display='none';">
+                                                    }
+                                                    <span class="fw-bold">@student.Name</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                @if (student.Gender == 1)
+                                                {
+                                                    <span class="badge bg-primary-subtle text-primary">
+                                                        <i class="bi bi-gender-male"></i> Nam
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-danger-subtle text-danger">
+                                                        <i class="bi bi-gender-female"></i> Nữ
+                                                    </span>
+                                                }
+                                            </td>
+                                            <td><small>@student.Email</small></td>
+                                            <td><small>@student.PhoneNumber</small></td>
+                                            <td>
+                                                <a asp-controller="Students" asp-action="Details" asp-route-id="@student.Id"
+                                                   class="btn btn-sm btn-outline-info"
+                                                   title="Xem chi tiết">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info mb-0 text-center">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Lớp học chưa có sinh viên nào
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0 mt-4 bg-light">
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <div class="text-muted small mb-1">Mã lớp</div>
+                            <div class="fw-bold">#@Model.Id</div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-muted small mb-1">Trạng thái</div>
+                            <div class="fw-bold text-success">
+                                <i class="bi bi-check-circle-fill"></i> Hoạt động
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-muted small mb-1">Cập nhật</div>
+                            <div class="fw-bold">@DateTime.Now.ToString("dd/MM/yyyy")</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nút quay lại -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="d-flex gap-2 justify-content-center">
+                <a asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                    <i class="bi bi-arrow-left"></i> Quay lại danh sách
+                </a>
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-lg">
+                    <i class="bi bi-pencil"></i> Chỉnh sửa
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

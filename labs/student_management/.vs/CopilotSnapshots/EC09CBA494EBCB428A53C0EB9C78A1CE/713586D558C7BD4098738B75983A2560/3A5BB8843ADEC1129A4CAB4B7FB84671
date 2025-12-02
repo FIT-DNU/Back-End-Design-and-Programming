@@ -1,0 +1,255 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - STU_DNU</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/student_management.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+
+<body>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <i class="bi bi-mortarboard-fill"></i>
+                <span class="brand-text">STU_DNU</span>
+            </div>
+            <button class="sidebar-toggle d-lg-none" id="sidebarToggle">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        
+        <div class="sidebar-menu">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Home" asp-action="Index">
+                        <i class="bi bi-house-door"></i>
+                        <span>Trang chủ</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" asp-controller="Students" asp-action="Index">
+                        <i class="bi bi-people"></i>
+                        <span>Sinh viên</span>
+                        <span class="badge bg-primary ms-auto">@TempData["StudentCount"]</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Classes" asp-action="Index">
+                        <i class="bi bi-building"></i>
+                        <span>Lớp học</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="bi bi-calendar-event"></i>
+                        <span>Lịch học</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="bi bi-journal-text"></i>
+                        <span>Điểm danh</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="bi bi-bar-chart"></i>
+                        <span>Thống kê</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="sidebar-divider"></div>
+            
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="bi bi-gear"></i>
+                        <span>Cài đặt</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="bi bi-question-circle"></i>
+                        <span>Trợ giúp</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Header -->
+        <header class="top-header">
+            <div class="header-left">
+                <button class="btn btn-icon d-lg-none" id="menuToggle">
+                    <i class="bi bi-list"></i>
+                </button>
+                
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" class="form-control" placeholder="Tìm kiếm sinh viên, lớp học..." id="globalSearch">
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <div class="header-date">
+                    <i class="bi bi-calendar3"></i>
+                    <span id="currentDate"></span>
+                </div>
+                
+                <button class="btn btn-icon position-relative" data-bs-toggle="dropdown">
+                    <i class="bi bi-bell"></i>
+                    <span class="notification-badge">3</span>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end notification-dropdown">
+                    <div class="dropdown-header">
+                        <h6>Thông báo</h6>
+                        <span class="badge bg-primary">3 mới</span>
+                    </div>
+                    <div class="dropdown-body">
+                        <a href="#" class="notification-item unread">
+                            <div class="notification-icon bg-primary">
+                                <i class="bi bi-person-plus"></i>
+                            </div>
+                            <div class="notification-content">
+                                <h6>Sinh viên mới</h6>
+                                <p>5 sinh viên đã được thêm vào hệ thống</p>
+                                <span class="time">5 phút trước</span>
+                            </div>
+                        </a>
+                        <a href="#" class="notification-item">
+                            <div class="notification-icon bg-success">
+                                <i class="bi bi-check-circle"></i>
+                            </div>
+                            <div class="notification-content">
+                                <h6>Hoàn thành</h6>
+                                <p>Đã xuất danh sách sinh viên thành công</p>
+                                <span class="time">1 giờ trước</span>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="dropdown-footer">
+                        <a href="#">Xem tất cả thông báo</a>
+                    </div>
+                </div>
+                
+                <div class="user-profile" data-bs-toggle="dropdown">
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=667eea&color=fff" alt="User" class="user-avatar">
+                    <div class="user-info d-none d-md-block">
+                        <span class="user-name">Admin</span>
+                        <span class="user-role">Quản trị viên</span>
+                    </div>
+                    <i class="bi bi-chevron-down ms-2"></i>
+                </div>
+                <div class="dropdown-menu dropdown-menu-end user-dropdown">
+                    <div class="dropdown-header">
+                        <img src="https://ui-avatars.com/api/?name=Admin&background=667eea&color=fff" alt="User" class="user-avatar-large">
+                        <div>
+                            <h6>Admin</h6>
+                            <p class="text-muted small mb-0">admin@stu-dnu.edu.vn</p>
+                        </div>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#">
+                        <i class="bi bi-person"></i> Hồ sơ của tôi
+                    </a>
+                    <a class="dropdown-item" href="#">
+                        <i class="bi bi-gear"></i> Cài đặt
+                    </a>
+                    <a class="dropdown-item" href="#">
+                        <i class="bi bi-question-circle"></i> Trợ giúp
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item text-danger" href="#">
+                        <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <div class="page-content">
+            <main role="main">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <!-- Mobile Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // Update current date
+            const now = new Date();
+            const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+            $('#currentDate').text(now.toLocaleDateString('vi-VN', options));
+
+            // Sidebar toggle for mobile
+            $('#menuToggle, #sidebarToggle').on('click', function() {
+                $('#sidebar').toggleClass('show');
+                $('#sidebarOverlay').toggleClass('show');
+                $('body').toggleClass('sidebar-open');
+            });
+
+            $('#sidebarOverlay').on('click', function() {
+                $('#sidebar').removeClass('show');
+                $(this).removeClass('show');
+                $('body').removeClass('sidebar-open');
+            });
+
+            // Set active nav link
+            const currentPath = window.location.pathname;
+            $('.sidebar-menu .nav-link').each(function() {
+                const href = $(this).attr('href');
+                if (href && currentPath.includes(href)) {
+                    $('.sidebar-menu .nav-link').removeClass('active');
+                    $(this).addClass('active');
+                }
+            });
+
+            // Global search
+            let searchTimeout;
+            $('#globalSearch').on('input', function() {
+                clearTimeout(searchTimeout);
+                const query = $(this).val();
+                
+                if (query.length > 2) {
+                    searchTimeout = setTimeout(() => {
+                        // Implement search logic here
+                        console.log('Searching for:', query);
+                    }, 300);
+                }
+            });
+
+            // Mark notifications as read
+            $('.notification-item.unread').on('click', function() {
+                $(this).removeClass('unread');
+                const badge = $('.notification-badge');
+                let count = parseInt(badge.text()) - 1;
+                if (count > 0) {
+                    badge.text(count);
+                } else {
+                    badge.hide();
+                }
+            });
+        });
+    </script>
+    
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>

@@ -1,0 +1,42 @@
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using student_management.Data;
+using student_management.Models;
+using System.Diagnostics;
+
+namespace student_management.Controllers
+{
+    [Authorize]
+    public class HomeController : Controller
+    {
+        private readonly ILogger<HomeController> _logger;
+        private readonly student_managementContext _context;
+
+
+        public HomeController(ILogger<HomeController> logger, student_managementContext context)
+        {
+            _logger = logger;
+            _context = context;
+        }
+
+        public IActionResult Index()
+
+        {
+            var students = _context.Student.ToList();
+            return View(students);
+        }
+
+        public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        [AllowAnonymous]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+    }
+}

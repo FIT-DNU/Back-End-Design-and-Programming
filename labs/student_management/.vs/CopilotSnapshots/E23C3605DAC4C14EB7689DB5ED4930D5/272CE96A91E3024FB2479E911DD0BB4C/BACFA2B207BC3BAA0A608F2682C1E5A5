@@ -1,0 +1,815 @@
+﻿@model IEnumerable<student_management.Models.Student>
+
+@{
+    ViewData["Title"] = "Quản lý sinh viên";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Header Section with Actions -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+                <div>
+                    <h1 class="display-5 fw-bold text-primary mb-1">
+                        <i class="bi bi-people-fill"></i> Danh sách sinh viên
+                    </h1>
+                    <p class="text-muted mb-0">
+                        <i class="bi bi-info-circle"></i> Quản lý và theo dõi thông tin sinh viên
+                    </p>
+                </div>
+                <div class="d-flex gap-2 flex-wrap">
+                    <button id="exportBtn" class="btn btn-outline-success" title="Xuất dữ liệu (Alt+E)">
+                        <i class="bi bi-file-earmark-excel"></i>
+                        <span class="d-none d-md-inline ms-1">Xuất Excel</span>
+                    </button>
+                    <button id="refreshBtn" class="btn btn-outline-primary" title="Làm mới (Alt+R)">
+                        <i class="bi bi-arrow-clockwise"></i>
+                        <span class="d-none d-md-inline ms-1">Làm mới</span>
+                    </button>
+                    <a asp-action="Create" class="btn btn-primary shadow-sm" title="Thêm mới (Alt+N)">
+                        <i class="bi bi-plus-circle"></i> Thêm sinh viên
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-4 col-lg-3">
+                            <label class="form-label small fw-bold text-muted mb-1">
+                                <i class="bi bi-search"></i> Tìm kiếm
+                                <kbd class="ms-2">Alt+S</kbd>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white">
+                                    <i class="bi bi-search"></i>
+                                </span>
+                                <input type="text" id="searchInput" class="form-control" placeholder="Tên, email, SĐT..." autocomplete="off">
+                                <button class="btn btn-outline-secondary" type="button" id="clearSearch" style="display:none;">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-lg-2">
+                            <label class="form-label small fw-bold text-muted mb-1">
+                                <i class="bi bi-gender-ambiguous"></i> Giới tính
+                            </label>
+                            <select id="genderFilter" class="form-select">
+                                <option value="">Tất cả</option>
+                                <option value="1">Nam</option>
+                                <option value="0">Nữ</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 col-lg-2">
+                            <label class="form-label small fw-bold text-muted mb-1">
+                                <i class="bi bi-geo-alt"></i> Khu vực
+                            </label>
+                            <select id="regionFilter" class="form-select">
+                                <option value="">Tất cả</option>
+                                @foreach (var region in Model.Select(m => m.Region).Distinct().OrderBy(r => r))
+                                {
+                                    <option value="@region">@region</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-2 col-lg-2">
+                            <label class="form-label small fw-bold text-muted mb-1">
+                                <i class="bi bi-sort-down"></i> Sắp xếp
+                            </label>
+                            <select id="sortBy" class="form-select">
+                                <option value="name-asc">Tên A-Z</option>
+                                <option value="name-desc">Tên Z-A</option>
+                                <option value="date-asc">Ngày sinh cũ nhất</option>
+                                <option value="date-desc">Ngày sinh mới nhất</option>
+                            </select>
+                        </div>
+                        <div class="col-md-12 col-lg-3">
+                            <div class="d-flex gap-2">
+                                <button id="clearFilter" class="btn btn-outline-secondary flex-fill" title="Xóa bộ lọc (Alt+C)">
+                                    <i class="bi bi-x-circle"></i> Xóa bộ lọc
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Info Bar with Pagination Controls -->
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+                <div class="d-flex align-items-center gap-3 flex-wrap">
+                    <div class="text-muted small">
+                        <i class="bi bi-list-check"></i> Hiển thị 
+                        <strong id="showingFrom">1</strong> - <strong id="showingTo">0</strong> 
+                        trong số <strong id="totalCount">@Model.Count()</strong> sinh viên
+                    </div>
+                    <div id="filterStatus" class="small text-primary" style="display:none;">
+                        <i class="bi bi-funnel-fill"></i> <span id="filterMessage"></span>
+                    </div>
+                </div>
+                
+                <!-- Pagination Controls -->
+                <div class="d-flex align-items-center gap-2">
+                    <label class="form-label small fw-bold text-muted mb-0 me-2">
+                        <i class="bi bi-grid-3x3-gap"></i> Hiển thị:
+                    </label>
+                    <select id="itemsPerPage" class="form-select form-select-sm" style="width: auto;">
+                        <option value="10">10</option>
+                        <option value="25" selected>25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                        <option value="all">Tất cả</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Section -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0" id="studentsTable">
+                            <thead class="table-light sticky-top">
+                                <tr>
+                                    <th class="ps-4" style="width: 60px;">
+                                        <input type="checkbox" id="selectAll" class="form-check-input" title="Chọn tất cả">
+                                    </th>
+                                    <th style="min-width: 200px;">@Html.DisplayNameFor(model => model.Name)</th>
+                                    <th style="min-width: 120px;">@Html.DisplayNameFor(model => model.DateOfBirth)</th>
+                                    <th style="min-width: 100px;">@Html.DisplayNameFor(model => model.Gender)</th>
+                                    <th style="min-width: 200px;">@Html.DisplayNameFor(model => model.Email)</th>
+                                    <th style="min-width: 130px;">@Html.DisplayNameFor(model => model.PhoneNumber)</th>
+                                    <th style="min-width: 120px;">@Html.DisplayNameFor(model => model.Region)</th>
+                                    <th class="text-center pe-4" style="min-width: 160px;">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                                @{ var index = 1; }
+                                @foreach (var item in Model)
+                                {
+                                    <tr class="student-row"
+                                        data-id="@item.Id"
+                                        data-name="@item.Name?.ToLower()"
+                                        data-email="@item.Email?.ToLower()"
+                                        data-phone="@item.PhoneNumber"
+                                        data-gender="@item.Gender"
+                                        data-region="@item.Region"
+                                        data-dob="@item.DateOfBirth.ToString("yyyy-MM-dd")">
+                                        <td class="ps-4">
+                                            <input type="checkbox" class="form-check-input row-checkbox" value="@item.Id">
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-circle me-3">
+                                                    @if (!string.IsNullOrEmpty(item.ImgUrl))
+                                                    {
+                                                        <img src="@item.ImgUrl" alt="@item.Name" class="avatar-img" 
+                                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                                                             loading="lazy">
+                                                        <div class="avatar-fallback" style="display:none;">
+                                                            @(item.Name?.FirstOrDefault().ToString().ToUpper() ?? "?")
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="avatar-fallback">
+                                                            @(item.Name?.FirstOrDefault().ToString().ToUpper() ?? "?")
+                                                        </div>
+                                                    }
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold">@item.Name</div>
+                                                    <div class="text-muted small d-md-none">@item.Email</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <i class="bi bi-calendar-event text-muted me-1"></i>
+                                            <span class="d-none d-lg-inline">@item.DateOfBirth.ToString("dd/MM/yyyy")</span>
+                                            <span class="d-lg-none">@item.DateOfBirth.ToString("dd/MM/yy")</span>
+                                            <div class="text-muted small">
+                                                @{
+                                                    var age = DateTime.Now.Year - item.DateOfBirth.Year;
+                                                    if (DateTime.Now.DayOfYear < item.DateOfBirth.DayOfYear) age--;
+                                                }
+                                                (@age tuổi)
+                                            </div>
+                                        </td>
+                                        <td>
+                                            @if (item.Gender == 1)
+                                            {
+                                                <span class="badge bg-primary-subtle text-primary">
+                                                    <i class="bi bi-gender-male"></i> Nam
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger-subtle text-danger">
+                                                    <i class="bi bi-gender-female"></i> Nữ
+                                                </span>
+                                            }
+                                        </td>
+                                        <td class="d-none d-md-table-cell">
+                                            <i class="bi bi-envelope text-muted me-1"></i>
+                                            <a href="mailto:@item.Email" class="text-decoration-none text-truncate d-inline-block" style="max-width: 200px;" title="@item.Email">
+                                                @item.Email
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <i class="bi bi-telephone text-muted me-1"></i>
+                                            <a href="tel:@item.PhoneNumber" class="text-decoration-none">@item.PhoneNumber</a>
+                                        </td>
+                                        <td>
+                                            <i class="bi bi-geo-alt text-muted me-1"></i>
+                                            <span class="badge bg-light text-dark border">@item.Region</span>
+                                        </td>
+                                        <td class="text-center pe-4">
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <a asp-action="Details" asp-route-id="@item.Id" 
+                                                   class="btn btn-outline-info" 
+                                                   title="Xem chi tiết"
+                                                   data-bs-toggle="tooltip">
+                                                    <i class="bi bi-eye"></i>
+                                                    <span class="d-none d-xl-inline ms-1">Chi tiết</span>
+                                                </a>
+                                                <a asp-action="Edit" asp-route-id="@item.Id" 
+                                                   class="btn btn-outline-warning" 
+                                                   title="Chỉnh sửa"
+                                                   data-bs-toggle="tooltip">
+                                                    <i class="bi bi-pencil"></i>
+                                                    <span class="d-none d-xl-inline ms-1">Sửa</span>
+                                                </a>
+                                                <a asp-action="Delete" asp-route-id="@item.Id" 
+                                                   class="btn btn-outline-danger" 
+                                                   title="Xóa"
+                                                   data-bs-toggle="tooltip">
+                                                    <i class="bi bi-trash"></i>
+                                                    <span class="d-none d-xl-inline ms-1">Xóa</span>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    index++;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Empty State -->
+                    @if (!Model.Any())
+                    {
+                        <div class="text-center py-5" id="emptyState">
+                            <div class="mb-4">
+                                <i class="bi bi-inbox display-1 text-muted"></i>
+                            </div>
+                            <h4 class="text-muted mb-3">Chưa có sinh viên nào</h4>
+                            <p class="text-muted mb-4">Bắt đầu bằng cách thêm sinh viên đầu tiên vào hệ thống</p>
+                            <a asp-action="Create" class="btn btn-primary btn-lg">
+                                <i class="bi bi-plus-circle"></i> Thêm sinh viên đầu tiên
+                            </a>
+                        </div>
+                    }
+                    
+                    <!-- No Results State -->
+                    <div class="text-center py-5" id="noResultsState" style="display:none;">
+                        <div class="mb-4">
+                            <i class="bi bi-search display-1 text-muted"></i>
+                        </div>
+                        <h4 class="text-muted mb-3">Không tìm thấy kết quả</h4>
+                        <p class="text-muted mb-4">Không có sinh viên nào phù hợp với bộ lọc của bạn</p>
+                        <button id="clearFilterFromNoResults" class="btn btn-outline-primary">
+                            <i class="bi bi-x-circle"></i> Xóa bộ lọc và thử lại
+                        </button>
+                    </div>
+                </div>
+                
+                @if (Model.Any())
+                {
+                    <div class="card-footer bg-white border-top">
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+                            <div class="text-muted small">
+                                <i class="bi bi-clock-history"></i> Cập nhật lần cuối: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")
+                            </div>
+                            
+                            <!-- Pagination -->
+                            <nav aria-label="Phân trang">
+                                <ul class="pagination pagination-sm mb-0" id="pagination">
+                                    <!-- Pagination will be generated by JavaScript -->
+                                </ul>
+                            </nav>
+                            
+                            <div class="small text-muted">
+                                <i class="bi bi-database"></i> Tổng số bản ghi: <strong>@Model.Count()</strong>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bulk Actions Bar (Hidden by default) -->
+<div id="bulkActionsBar" class="position-fixed bottom-0 start-50 translate-middle-x bg-primary text-white rounded-top shadow-lg px-4 py-3" style="display:none; z-index: 1000; min-width: 500px;">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <i class="bi bi-check-square me-2"></i>
+            <strong id="selectedCount">0</strong> sinh viên được chọn
+        </div>
+        <div class="d-flex gap-2">
+            <button id="bulkExport" class="btn btn-sm btn-light" title="Xuất dữ liệu đã chọn">
+                <i class="bi bi-download"></i> Xuất
+            </button>
+            <button id="clearSelection" class="btn btn-sm btn-outline-light">
+                <i class="bi bi-x"></i> Bỏ chọn
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div id="loadingOverlay" style="display:none;">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Đang tải...</span>
+    </div>
+</div>
+
+<!-- Keyboard Shortcuts Help Modal -->
+<div class="modal fade" id="shortcutsModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-keyboard"></i> Phím tắt
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-sm">
+                    <tbody>
+                        <tr>
+                            <td><kbd>Alt</kbd> + <kbd>S</kbd></td>
+                            <td>Tìm kiếm</td>
+                        </tr>
+                        <tr>
+                            <td><kbd>Alt</kbd> + <kbd>N</kbd></td>
+                            <td>Thêm sinh viên mới</td>
+                        </tr>
+                        <tr>
+                            <td><kbd>Alt</kbd> + <kbd>R</kbd></td>
+                            <td>Làm mới trang</td>
+                        </tr>
+                        <tr>
+                            <td><kbd>Alt</kbd> + <kbd>C</kbd></td>
+                            <td>Xóa bộ lọc</td>
+                        </tr>
+                        <tr>
+                            <td><kbd>Alt</kbd> + <kbd>E</kbd></td>
+                            <td>Xuất Excel</td>
+                        </tr>
+                        <tr>
+                            <td><kbd>?</kbd></td>
+                            <td>Hiện bảng phím tắt này</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Initialize tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // Pagination variables
+            let currentPage = 1;
+            let itemsPerPage = 25;
+            let allRows = [];
+            let filteredRows = [];
+
+            // Initialize
+            updateRowsList();
+            applyFiltersAndSort();
+
+            // Keyboard shortcuts
+            $(document).on('keydown', function(e) {
+                if (e.altKey) {
+                    switch(e.key.toLowerCase()) {
+                        case 's':
+                            e.preventDefault();
+                            $('#searchInput').focus();
+                            break;
+                        case 'n':
+                            e.preventDefault();
+                            window.location.href = '@Url.Action("Create")';
+                            break;
+                        case 'r':
+                            e.preventDefault();
+                            $('#refreshBtn').click();
+                            break;
+                        case 'c':
+                            e.preventDefault();
+                            $('#clearFilter').click();
+                            break;
+                        case 'e':
+                            e.preventDefault();
+                            $('#exportBtn').click();
+                            break;
+                    }
+                } else if (e.key === '?') {
+                    $('#shortcutsModal').modal('show');
+                }
+            });
+
+            // Show/hide clear search button
+            $('#searchInput').on('input', function() {
+                $('#clearSearch').toggle($(this).val().length > 0);
+                applyFiltersAndSort();
+            });
+
+            $('#clearSearch').on('click', function() {
+                $('#searchInput').val('');
+                $(this).hide();
+                applyFiltersAndSort();
+            });
+
+            // Filter functionality
+            $('#genderFilter, #regionFilter').on('change', function() {
+                applyFiltersAndSort();
+            });
+
+            // Sort functionality
+            $('#sortBy').on('change', function() {
+                applyFiltersAndSort();
+            });
+
+            // Items per page
+            $('#itemsPerPage').on('change', function() {
+                itemsPerPage = $(this).val() === 'all' ? filteredRows.length : parseInt($(this).val());
+                currentPage = 1;
+                updateDisplay();
+            });
+
+            // Clear filter
+            $('#clearFilter, #clearFilterFromNoResults').on('click', function() {
+                $('#searchInput').val('');
+                $('#genderFilter').val('');
+                $('#regionFilter').val('');
+                $('#sortBy').val('name-asc');
+                $('#clearSearch').hide();
+                applyFiltersAndSort();
+            });
+
+            // Refresh button
+            $('#refreshBtn').on('click', function() {
+                $(this).find('i').addClass('spin-animation');
+                setTimeout(() => {
+                    location.reload();
+                }, 500);
+            });
+
+            // Select all checkbox
+            $('#selectAll').on('change', function() {
+                const isChecked = $(this).is(':checked');
+                $('.student-row:visible .row-checkbox').prop('checked', isChecked);
+                updateBulkActionsBar();
+            });
+
+            // Row checkbox
+            $(document).on('change', '.row-checkbox', function() {
+                updateBulkActionsBar();
+                const visibleCheckboxes = $('.student-row:visible .row-checkbox');
+                const checkedCheckboxes = visibleCheckboxes.filter(':checked');
+                $('#selectAll').prop('checked', visibleCheckboxes.length === checkedCheckboxes.length);
+            });
+
+            // Clear selection
+            $('#clearSelection').on('click', function() {
+                $('.row-checkbox').prop('checked', false);
+                $('#selectAll').prop('checked', false);
+                updateBulkActionsBar();
+            });
+
+            // Bulk export
+            $('#bulkExport').on('click', function() {
+                const selectedIds = $('.row-checkbox:checked').map(function() {
+                    return $(this).val();
+                }).get();
+                
+                const selectedRows = allRows.filter(row => 
+                    selectedIds.includes($(row).data('id').toString())
+                );
+                
+                exportToExcel(selectedRows);
+            });
+
+            // Export button
+            $('#exportBtn').on('click', function() {
+                exportToExcel(filteredRows.length > 0 ? filteredRows : allRows);
+            });
+
+            function updateRowsList() {
+                allRows = $('.student-row').toArray();
+            }
+
+            function applyFiltersAndSort() {
+                const searchTerm = $('#searchInput').val().toLowerCase();
+                const genderFilter = $('#genderFilter').val();
+                const regionFilter = $('#regionFilter').val();
+                const sortBy = $('#sortBy').val();
+                const hasFilters = searchTerm !== '' || genderFilter !== '' || regionFilter !== '';
+
+                // Filter
+                filteredRows = allRows.filter(function(row) {
+                    const $row = $(row);
+                    const name = $row.data('name') || '';
+                    const email = $row.data('email') || '';
+                    const phone = $row.data('phone') || '';
+                    const gender = $row.data('gender').toString();
+                    const region = $row.data('region') || '';
+
+                    const matchSearch = searchTerm === '' || 
+                                      name.includes(searchTerm) || 
+                                      email.includes(searchTerm) || 
+                                      phone.includes(searchTerm);
+                    
+                    const matchGender = genderFilter === '' || gender === genderFilter;
+                    const matchRegion = regionFilter === '' || region === regionFilter;
+
+                    return matchSearch && matchGender && matchRegion;
+                });
+
+                // Sort
+                filteredRows.sort(function(a, b) {
+                    const $a = $(a);
+                    const $b = $(b);
+                    let aVal, bVal;
+                    
+                    switch(sortBy) {
+                        case 'name-asc':
+                            aVal = $a.data('name');
+                            bVal = $b.data('name');
+                            return aVal.localeCompare(bVal);
+                        case 'name-desc':
+                            aVal = $a.data('name');
+                            bVal = $b.data('name');
+                            return bVal.localeCompare(aVal);
+                        case 'date-asc':
+                            aVal = new Date($a.data('dob'));
+                            bVal = new Date($b.data('dob'));
+                            return aVal - bVal;
+                        case 'date-desc':
+                            aVal = new Date($a.data('dob'));
+                            bVal = new Date($b.data('dob'));
+                            return bVal - aVal;
+                    }
+                    return 0;
+                });
+
+                // Update filter status
+                if (hasFilters) {
+                    const filterParts = [];
+                    if (searchTerm) filterParts.push('tìm kiếm: "' + searchTerm + '"');
+                    if (genderFilter) filterParts.push('giới tính: ' + (genderFilter === '1' ? 'Nam' : 'Nữ'));
+                    if (regionFilter) filterParts.push('khu vực: ' + regionFilter);
+                    
+                    $('#filterMessage').text('Đang lọc theo ' + filterParts.join(', '));
+                    $('#filterStatus').show();
+                } else {
+                    $('#filterStatus').hide();
+                }
+
+                currentPage = 1;
+                updateDisplay();
+            }
+
+            function updateDisplay() {
+                // Hide all rows
+                $('.student-row').hide();
+
+                // Show/hide no results state
+                if (filteredRows.length === 0) {
+                    $('#noResultsState').show();
+                    $('#tableBody').parent().hide();
+                    $('#pagination').empty();
+                    return;
+                } else {
+                    $('#noResultsState').hide();
+                    $('#tableBody').parent().show();
+                }
+
+                // Calculate pagination
+                const totalItems = filteredRows.length;
+                const totalPages = Math.ceil(totalItems / itemsPerPage);
+                const startIndex = (currentPage - 1) * itemsPerPage;
+                const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+
+                // Show rows for current page
+                const rowsToShow = filteredRows.slice(startIndex, endIndex);
+                $('#tableBody').empty();
+                rowsToShow.forEach((row, index) => {
+                    $('#tableBody').append(row);
+                    $(row).show();
+                });
+
+                // Update counts
+                $('#showingFrom').text(totalItems > 0 ? startIndex + 1 : 0);
+                $('#showingTo').text(endIndex);
+                $('#totalCount').text(totalItems);
+
+                // Generate pagination
+                generatePagination(totalPages);
+
+                // Update select all checkbox
+                updateSelectAllState();
+            }
+
+            function generatePagination(totalPages) {
+                const $pagination = $('#pagination');
+                $pagination.empty();
+
+                if (totalPages <= 1) return;
+
+                // Previous button
+                $pagination.append(`
+                    <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                        <a class="page-link" href="#" data-page="${currentPage - 1}">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+                `);
+
+                // Page numbers
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(totalPages, currentPage + 2);
+
+                if (startPage > 1) {
+                    $pagination.append(`<li class="page-item"><a class="page-link" href="#" data-page="1">1</a></li>`);
+                    if (startPage > 2) {
+                        $pagination.append(`<li class="page-item disabled"><span class="page-link">...</span></li>`);
+                    }
+                }
+
+                for (let i = startPage; i <= endPage; i++) {
+                    $pagination.append(`
+                        <li class="page-item ${i === currentPage ? 'active' : ''}">
+                            <a class="page-link" href="#" data-page="${i}">${i}</a>
+                        </li>
+                    `);
+                }
+
+                if (endPage < totalPages) {
+                    if (endPage < totalPages - 1) {
+                        $pagination.append(`<li class="page-item disabled"><span class="page-link">...</span></li>`);
+                    }
+                    $pagination.append(`<li class="page-item"><a class="page-link" href="#" data-page="${totalPages}">${totalPages}</a></li>`);
+                }
+
+                // Next button
+                $pagination.append(`
+                    <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                        <a class="page-link" href="#" data-page="${currentPage + 1}">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                `);
+            }
+
+            // Pagination click handler
+            $(document).on('click', '#pagination a.page-link', function(e) {
+                e.preventDefault();
+                const page = parseInt($(this).data('page'));
+                if (page && page !== currentPage) {
+                    currentPage = page;
+                    updateDisplay();
+                    $('html, body').animate({ scrollTop: 0 }, 300);
+                }
+            });
+
+            function updateSelectAllState() {
+                const visibleCheckboxes = $('.student-row:visible .row-checkbox');
+                const checkedCheckboxes = visibleCheckboxes.filter(':checked');
+                $('#selectAll').prop('checked', visibleCheckboxes.length > 0 && visibleCheckboxes.length === checkedCheckboxes.length);
+            }
+
+            function updateBulkActionsBar() {
+                const checkedCount = $('.row-checkbox:checked').length;
+                $('#selectedCount').text(checkedCount);
+                
+                if (checkedCount > 0) {
+                    $('#bulkActionsBar').slideDown(200);
+                } else {
+                    $('#bulkActionsBar').slideUp(200);
+                }
+            }
+
+            function exportToExcel(rows) {
+                const data = [];
+                
+                // Headers
+                data.push(['STT', 'Họ và tên', 'Ngày sinh', 'Tuổi', 'Giới tính', 'Email', 'Số điện thoại', 'Khu vực']);
+                
+                // Data rows
+                rows.forEach((row, index) => {
+                    const $row = $(row);
+                    const name = $row.find('td:eq(1) .fw-bold').text().trim();
+                    const dob = $row.data('dob');
+                    const dobFormatted = new Date(dob).toLocaleDateString('vi-VN');
+                    const age = $row.find('td:eq(2) .text-muted').text().match(/\d+/)?.[0] || '';
+                    const gender = $row.find('td:eq(3) .badge').text().trim();
+                    const email = $row.find('td:eq(4) a').text().trim();
+                    const phone = $row.find('td:eq(5) a').text().trim();
+                    const region = $row.find('td:eq(6) .badge').text().trim();
+                    
+                    data.push([index + 1, name, dobFormatted, age, gender, email, phone, region]);
+                });
+                
+                // Create workbook
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.aoa_to_sheet(data);
+                
+                // Set column widths
+                ws['!cols'] = [
+                    { wch: 5 },   // STT
+                    { wch: 25 },  // Họ và tên
+                    { wch: 12 },  // Ngày sinh
+                    { wch: 6 },   // Tuổi
+                    { wch: 10 },  // Giới tính
+                    { wch: 30 },  // Email
+                    { wch: 15 },  // Số điện thoại
+                    { wch: 15 }   // Khu vực
+                ];
+                
+                XLSX.utils.book_append_sheet(wb, ws, 'Danh sách sinh viên');
+                
+                // Export
+                const fileName = `DanhSachSinhVien_${new Date().toISOString().split('T')[0]}.xlsx`;
+                XLSX.writeFile(wb, fileName);
+                
+                // Show success message
+                showToast('success', 'Xuất dữ liệu thành công!');
+            }
+
+            function showToast(type, message) {
+                const toast = $(`
+                    <div class="toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0 position-fixed bottom-0 end-0 m-3" role="alert" style="z-index: 9999;">
+                        <div class="d-flex">
+                            <div class="toast-body">
+                                <i class="bi bi-${type === 'success' ? 'check-circle' : 'x-circle'}"></i> ${message}
+                            </div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                        </div>
+                    </div>
+                `);
+                
+                $('body').append(toast);
+                const bsToast = new bootstrap.Toast(toast[0], { delay: 3000 });
+                bsToast.show();
+                
+                toast.on('hidden.bs.toast', function() {
+                    $(this).remove();
+                });
+            }
+
+            // Add hover effect to rows
+            // $('.student-row').hover(
+            //     function() { $(this).addClass('table-row-hover'); },
+            //     function() { $(this).removeClass('table-row-hover'); }
+            // );
+
+            // Smooth scroll to top on navigation
+            $('a[asp-action]').on('click', function(e) {
+                if ($(this).attr('asp-action') === 'Create') {
+                    $('#loadingOverlay').fadeIn(200);
+                }
+            });
+
+            // Show keyboard shortcuts hint
+            setTimeout(function() {
+                if (!localStorage.getItem('shortcutsHintShown')) {
+                    showToast('success', 'Nhấn "?" để xem các phím tắt hữu ích');
+                    localStorage.setItem('shortcutsHintShown', 'true');
+                }
+            }, 2000);
+        });
+    </script>
+}

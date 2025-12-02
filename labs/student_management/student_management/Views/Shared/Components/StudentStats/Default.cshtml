@@ -1,0 +1,67 @@
+﻿@model StudentStatsViewModel
+
+<div class="statistics-section mb-4">
+    <div class="row g-3">
+        <div class="col-sm-6 col-xl-3">
+            <div class="stats-card stats-card-primary">
+                <div class="stats-card-icon">
+                    <i class="bi bi-people"></i>
+                </div>
+                <div class="stats-card-body">
+                    <div class="stats-label">Tổng sinh viên</div>
+                    <div class="stats-value">@Model.TotalStudents</div>
+                    <div class="stats-trend stats-trend-up">
+                        <i class="bi bi-arrow-up-short"></i>
+                        <span>12% tháng trước</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-xl-3">
+            <div class="stats-card stats-card-info">
+                <div class="stats-card-icon">
+                    <i class="bi bi-gender-male"></i>
+                </div>
+                <div class="stats-card-body">
+                    <div class="stats-label">Sinh viên nam</div>
+                    <div class="stats-value">@Model.MaleCount</div>
+                    <div class="stats-trend">
+                        <span>@((Model.MaleCount * 100.0 / (Model.TotalStudents > 0 ? Model.TotalStudents : 1)).ToString("F1"))%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-xl-3">
+            <div class="stats-card stats-card-danger">
+                <div class="stats-card-icon">
+                    <i class="bi bi-gender-female"></i>
+                </div>
+                <div class="stats-card-body">
+                    <div class="stats-label">Sinh viên nữ</div>
+                    <div class="stats-value">@Model.FemaleCount</div>
+                    <div class="stats-trend">
+                        <span>@((Model.FemaleCount * 100.0 / (Model.TotalStudents > 0 ? Model.TotalStudents : 1)).ToString("F1"))%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-xl-3">
+            <div class="stats-card stats-card-warning">
+                <div class="stats-card-icon">
+                    <i class="bi bi-geo-alt"></i>
+                </div>
+                <div class="stats-card-body">
+                    <div class="stats-label">Khu vực</div>
+                    <div class="stats-value">@Model.RegionsCount</div>
+                    <div class="stats-trend">
+                        <span>Địa điểm</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,20 @@
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace student_management.Models
+{
+    [Table("class")]
+    public class Class
+    {
+        [Column("id")]
+        public int Id { get; set; }
+
+        [Column("name")]
+        public string Name { get; set; }
+
+        [Column("description")]
+        public string Description { get; set; }
+
+        public ICollection<Student> Students { get; } = new List<Student>();
+    }
+
+}

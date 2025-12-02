@@ -1,0 +1,251 @@
+﻿@model IEnumerable<student_management.Models.Student>
+
+@{
+    ViewData["Title"] = "Quản lý sinh viên";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="display-5 fw-bold text-primary mb-1">
+                        <i class="bi bi-people-fill"></i> Danh sách sinh viên
+                    </h1>
+                    <p class="text-muted">Quản lý thông tin sinh viên</p>
+                </div>
+                <div>
+                    <a asp-action="Create" class="btn btn-primary btn-lg shadow-sm">
+                        <i class="bi bi-plus-circle"></i> Thêm sinh viên
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <span class="input-group-text bg-white">
+                                    <i class="bi bi-search"></i>
+                                </span>
+                                <input type="text" id="searchInput" class="form-control" placeholder="Tìm kiếm theo tên, email, số điện thoại...">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <select id="genderFilter" class="form-select">
+                                <option value="">Tất cả giới tính</option>
+                                <option value="1">Nam</option>
+                                <option value="0">Nữ</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select id="regionFilter" class="form-select">
+                                <option value="">Tất cả khu vực</option>
+                                @foreach (var region in Model.Select(m => m.Region).Distinct().OrderBy(r => r))
+                                {
+                                    <option value="@region">@region</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button id="clearFilter" class="btn btn-outline-secondary w-100">
+                                <i class="bi bi-x-circle"></i> Xóa lọc
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Section -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" id="studentsTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4">STT</th>
+                                    <th>@Html.DisplayNameFor(model => model.Name)</th>
+                                    <th>@Html.DisplayNameFor(model => model.DateOfBirth)</th>
+                                    <th>@Html.DisplayNameFor(model => model.Gender)</th>
+                                    <th>@Html.DisplayNameFor(model => model.Email)</th>
+                                    <th>@Html.DisplayNameFor(model => model.PhoneNumber)</th>
+                                    <th>@Html.DisplayNameFor(model => model.Region)</th>
+                                    <th class="text-center pe-4">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{ var index = 1; }
+                                @foreach (var item in Model)
+                                {
+                                    <tr class="student-row"
+                                        data-name="@item.Name?.ToLower()"
+                                        data-email="@item.Email?.ToLower()"
+                                        data-phone="@item.PhoneNumber"
+                                        data-gender="@item.Gender"
+                                        data-region="@item.Region">
+                                        <td class="ps-4 fw-bold text-muted">@index</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-circle me-3">
+                                                    @if (!string.IsNullOrEmpty(item.ImgUrl))
+                                                    {
+                                                        <img src="@item.ImgUrl" alt="@item.Name" class="avatar-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                                        <div class="avatar-fallback" style="display:none;">
+                                                            @(item.Name?.FirstOrDefault().ToString().ToUpper() ?? "?")
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="avatar-fallback">
+                                                            @(item.Name?.FirstOrDefault().ToString().ToUpper() ?? "?")
+                                                        </div>
+                                                    }
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold">@item.Name</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <i class="bi bi-calendar-event text-muted me-1"></i>
+                                            @item.DateOfBirth.ToString("dd/MM/yyyy")
+                                        </td>
+                                        <td>
+                                            @if (item.Gender == 1)
+                                            {
+                                                <span class="badge bg-primary-subtle text-primary">
+                                                    <i class="bi bi-gender-male"></i> Nam
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger-subtle text-danger">
+                                                    <i class="bi bi-gender-female"></i> Nữ
+                                                </span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <i class="bi bi-envelope text-muted me-1"></i>
+                                            <a href="mailto:@item.Email" class="text-decoration-none">@item.Email</a>
+                                        </td>
+                                        <td>
+                                            <i class="bi bi-telephone text-muted me-1"></i>
+                                            @item.PhoneNumber
+                                        </td>
+                                        <td>
+                                            <i class="bi bi-geo-alt text-muted me-1"></i>
+                                            @item.Region
+                                        </td>
+                                        <td class="text-center pe-4">
+                                            <div class="btn-group" role="group">
+                                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info" title="Xem chi tiết">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning" title="Chỉnh sửa">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger" title="Xóa">
+                                                    <i class="bi bi-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    index++;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    @if (!Model.Any())
+                    {
+                        <div class="text-center py-5">
+                            <i class="bi bi-inbox display-1 text-muted"></i>
+                            <p class="text-muted mt-3">Chưa có sinh viên nào</p>
+                            <a asp-action="Create" class="btn btn-primary">
+                                <i class="bi bi-plus-circle"></i> Thêm sinh viên đầu tiên
+                            </a>
+                        </div>
+                    }
+                </div>
+                @if (Model.Any())
+                {
+                    <div class="card-footer bg-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="text-muted">
+                                Hiển thị <span id="visibleCount">@Model.Count()</span> / <span id="totalCount">@Model.Count()</span> sinh viên
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Search functionality
+            $('#searchInput').on('keyup', function() {
+                filterTable();
+            });
+
+            // Filter functionality
+            $('#genderFilter, #regionFilter').on('change', function() {
+                filterTable();
+            });
+
+            // Clear filter
+            $('#clearFilter').on('click', function() {
+                $('#searchInput').val('');
+                $('#genderFilter').val('');
+                $('#regionFilter').val('');
+                filterTable();
+            });
+
+            function filterTable() {
+                var searchTerm = $('#searchInput').val().toLowerCase();
+                var genderFilter = $('#genderFilter').val();
+                var regionFilter = $('#regionFilter').val();
+                var visibleCount = 0;
+
+                $('.student-row').each(function() {
+                    var $row = $(this);
+                    var name = $row.data('name') || '';
+                    var email = $row.data('email') || '';
+                    var phone = $row.data('phone') || '';
+                    var gender = $row.data('gender').toString();
+                    var region = $row.data('region') || '';
+
+                    var matchSearch = searchTerm === '' || 
+                                    name.includes(searchTerm) || 
+                                    email.includes(searchTerm) || 
+                                    phone.includes(searchTerm);
+                    
+                    var matchGender = genderFilter === '' || gender === genderFilter;
+                    var matchRegion = regionFilter === '' || region === regionFilter;
+
+                    if (matchSearch && matchGender && matchRegion) {
+                        $row.show();
+                        visibleCount++;
+                    } else {
+                        $row.hide();
+                    }
+                });
+
+                $('#visibleCount').text(visibleCount);
+            }
+        });
+    </script>
+}

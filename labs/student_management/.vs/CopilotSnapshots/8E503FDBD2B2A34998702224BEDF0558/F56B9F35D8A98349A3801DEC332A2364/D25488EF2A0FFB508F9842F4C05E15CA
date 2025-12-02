@@ -1,0 +1,167 @@
+﻿@model student_management.Models.Student
+
+@{
+    ViewData["Title"] = "Xóa sinh viên";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-action="Index">Danh sách sinh viên</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Xóa sinh viên</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Warning Alert -->
+            <div class="alert alert-danger border-0 shadow-sm d-flex align-items-center mb-4" role="alert">
+                <i class="bi bi-exclamation-triangle-fill fs-3 me-3"></i>
+                <div>
+                    <h5 class="alert-heading mb-1">Cảnh báo!</h5>
+                    <p class="mb-0">Bạn có chắc chắn muốn xóa sinh viên này không? Hành động này không thể hoàn tác.</p>
+                </div>
+            </div>
+
+            <!-- Student Info Card -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-trash"></i> Xác nhận xóa sinh viên
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Student Avatar and Name -->
+                    <div class="text-center mb-4 pb-4 border-bottom">
+                        @if (!string.IsNullOrEmpty(Model.ImgUrl))
+                        {
+                            <img src="@Model.ImgUrl" alt="@Model.Name" class="rounded-circle shadow mb-3" style="width: 120px; height: 120px; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="student-detail-avatar-fallback rounded-circle shadow mx-auto mb-3" style="width: 120px; height: 120px; display:none;">
+                                <span class="display-4">@(Model.Name?.FirstOrDefault().ToString().ToUpper() ?? "?")</span>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="student-detail-avatar-fallback rounded-circle shadow mx-auto mb-3" style="width: 120px; height: 120px;">
+                                <span class="display-4">@(Model.Name?.FirstOrDefault().ToString().ToUpper() ?? "?")</span>
+                            </div>
+                        }
+                        <h3 class="fw-bold text-danger mb-0">@Model.Name</h3>
+                    </div>
+
+                    <!-- Student Details -->
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <div class="detail-label">
+                                    <i class="bi bi-person text-danger me-2"></i>
+                                    @Html.DisplayNameFor(model => model.Name)
+                                </div>
+                                <div class="detail-value">
+                                    @Html.DisplayFor(model => model.Name)
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <div class="detail-label">
+                                    <i class="bi bi-calendar-event text-danger me-2"></i>
+                                    @Html.DisplayNameFor(model => model.DateOfBirth)
+                                </div>
+                                <div class="detail-value">
+                                    @Model.DateOfBirth.ToString("dd/MM/yyyy")
+                                    <span class="text-muted ms-2">
+                                        (@((DateTime.Now.Year - Model.DateOfBirth.Year)) tuổi)
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <div class="detail-label">
+                                    <i class="bi bi-gender-ambiguous text-danger me-2"></i>
+                                    @Html.DisplayNameFor(model => model.Gender)
+                                </div>
+                                <div class="detail-value">
+                                    @if (Model.Gender == 1)
+                                    {
+                                        <span class="badge bg-primary-subtle text-primary">
+                                            <i class="bi bi-gender-male"></i> Nam
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger-subtle text-danger">
+                                            <i class="bi bi-gender-female"></i> Nữ
+                                        </span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <div class="detail-label">
+                                    <i class="bi bi-geo-alt text-danger me-2"></i>
+                                    @Html.DisplayNameFor(model => model.Region)
+                                </div>
+                                <div class="detail-value">
+                                    @Html.DisplayFor(model => model.Region)
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <div class="detail-label">
+                                    <i class="bi bi-envelope text-danger me-2"></i>
+                                    @Html.DisplayNameFor(model => model.Email)
+                                </div>
+                                <div class="detail-value">
+                                    @Html.DisplayFor(model => model.Email)
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <div class="detail-label">
+                                    <i class="bi bi-telephone text-danger me-2"></i>
+                                    @Html.DisplayNameFor(model => model.PhoneNumber)
+                                </div>
+                                <div class="detail-value">
+                                    @Html.DisplayFor(model => model.PhoneNumber)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Confirmation Form -->
+                    <form asp-action="Delete" class="mt-4">
+                        <input type="hidden" asp-for="Id" />
+                        <hr class="my-4">
+                        <div class="d-flex gap-3 justify-content-end">
+                            <a asp-action="Index" class="btn btn-outline-secondary btn-lg px-4">
+                                <i class="bi bi-x-circle"></i> Hủy bỏ
+                            </a>
+                            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-info btn-lg px-4">
+                                <i class="bi bi-eye"></i> Xem chi tiết
+                            </a>
+                            <button type="submit" class="btn btn-danger btn-lg px-4" onclick="return confirm('Bạn có chắc chắn muốn xóa sinh viên này không?');">
+                                <i class="bi bi-trash"></i> Xác nhận xóa
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
