@@ -12,7 +12,9 @@ Bạn cần cài đặt các gói sau thông qua **Package Manager Console** tro
 Install-Package Microsoft.EntityFrameworkCore.SqlServer
 Install-Package Microsoft.EntityFrameworkCore.Tools
 Install-Package Microsoft.EntityFrameworkCore.Design
+```
 
+## 2. Cấu hình Chuỗi kết nối (Connection String)
 Mở file **`appsettings.json`** và thêm đoạn mã sau vào phía trên cùng:
 
 ```json
@@ -21,6 +23,8 @@ Mở file **`appsettings.json`** và thêm đoạn mã sau vào phía trên cùn
     "DefaultConnection": "Server=YOUR_SERVER_NAME;Database=MyDatabaseName;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=true"
   }
 }
+```
+
 
 ## 3. Tạo lớp DbContext
 
@@ -42,6 +46,7 @@ namespace YourProject.Data
         // Ví dụ: public DbSet<User> Users { get; set; }
     }
 }
+```
 
 ## 4. Cấu hình trong Program.cs
 
@@ -66,6 +71,8 @@ builder.Services.AddControllersWithViews();
 var app = builder.Build();
 
 // Các cấu hình Middleware phía dưới giữ nguyên...
+
+```
 
 ## 5. Thực hiện Migration để tạo Database
 
