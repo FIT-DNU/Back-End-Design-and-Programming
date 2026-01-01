@@ -90,6 +90,10 @@ Sau khi đã hoàn tất cấu hình Code, bạn cần chạy lệnh Migration �
    ```powershell
    Add-Migration InitialCreate
 
+3. **Update thay đổi**
+    ```powershell
+    Update-Database
+
 ## Các lỗi thường gặp và Cách khắc phục
 
 Dưới đây là các lỗi phổ biến khi kết nối ASP.NET Core 8 với SQL Server 2022:
