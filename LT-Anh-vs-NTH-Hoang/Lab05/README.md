@@ -6,12 +6,12 @@ Tài liệu này hướng dẫn chi tiết cách thiết lập kết nối Datab
 
 ## 1. Cài đặt các thư viện (NuGet Packages)
 
-Bạn cần cài đặt các gói sau thông qua **Package Manager Console** trong Visual Studio:
+Bạn cần cài đặt các gói sau thông qua **Package Manager Console** trong Visual Studio. Mở Tools > NuGet Package Manager > Package Manager Console và chạy các lệnh sau:
 
 ```powershell
-Install-Package Microsoft.EntityFrameworkCore.SqlServer
-Install-Package Microsoft.EntityFrameworkCore.Tools
-Install-Package Microsoft.EntityFrameworkCore.Design
+Install-Package Microsoft.EntityFrameworkCore.SqlServer -Version 8.0.11
+Install-Package Microsoft.EntityFrameworkCore.Tools -Version 8.0.11
+Install-Package Microsoft.EntityFrameworkCore.Design -Version 8.0.11
 ```
 
 ## 2. Cấu hình Chuỗi kết nối (Connection String)
@@ -24,6 +24,9 @@ Mở file **`appsettings.json`** và thêm đoạn mã sau vào phía trên cùn
   }
 }
 ```
+- YOUR_SERVER_NAME: Thay bằng tên SQL Server của bạn (ví dụ: .\SQLEXPRESS hoặc tên máy tính).
+
+- TrustServerCertificate=True: Cần thiết cho các phiên bản SQL Server mới để tránh lỗi bảo mật SSL.
 
 
 ## 3. Tạo lớp DbContext
