@@ -1,12 +1,6 @@
 # Tách Layout Client và Admin trong ASP.NET Core MVC
 
-## Mục tiêu
-
-Tách giao diện (Layout) thành **ClientLayout** và **AdminLayout** nhằm:
-
-* Phân tách rõ ràng chức năng theo **vai trò (Role)** và **quyền (Authorization)**.
-* Dễ bảo trì, mở rộng và kiểm soát giao diện.
-* Tránh trộn lẫn UI giữa người dùng cuối và quản trị viên.
+Tài liệu này hướng dẫn chi tiết cách phân tách bố cục cho hai tác nhân Admin và User tương ứng với _AdminLayout.cshtml và _ClientLayout.cshtml.
 
 ---
 
@@ -108,7 +102,7 @@ Ví dụ nội dung chính:
 
 ---
 
-## 6. Kết hợp phân quyền (Authorization)
+## 6. Kết hợp phân quyền (Sau khi hệ thống đã có chức năng xác thực)
 
 Ví dụ gán quyền cho Controller Admin:
 
@@ -130,19 +124,108 @@ public class DashboardController : Controller
 
 ---
 
-## 7. Nguyên tắc khuyến nghị
+## Các lỗi thường gặp và Cách khắc phục
 
-* Client và Admin **không dùng chung layout**
-* Menu admin không render theo điều kiện role trong ClientLayout
-* Admin nên đặt trong thư mục riêng (`/Admin`)
-* Layout chỉ lo giao diện, không xử lý nghiệp vụ
+### Lỗi 1: View Admin vẫn dùng ClientLayout
+
+**Nguyên nhân:**
+
+* Không có `_ViewStart.cshtml` trong thư mục `Views/Admin`
+* Hoặc gán sai đường dẫn layout
+
+**Khắc phục:**
+
+* Tạo file `Views/Admin/_ViewStart.cshtml`
+* Gán đúng layout:
+
+```csharp
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+```
 
 ---
 
-## 8. Kết luận
+### Lỗi 2: Đã phân quyền Admin nhưng vẫn truy cập được URL
 
-Việc tách **ClientLayout** và **AdminLayout** là bắt buộc với dự án MVC nghiêm túc:
+**Nguyên nhân:**
 
-* Rõ ràng vai trò
-* Dễ kiểm soát quyền
-* Dễ mở rộng về sau (CMS, ERP, Dashboard)
+* Chỉ kiểm soát giao diện, chưa kiểm soát Controller
+* Thiếu `[Authorize]`
+
+**Khắc phục:**
+
+* Bắt buộc gắn `[Authorize(Roles = "Admin")]` cho controller hoặc action Admin
+* Không dựa vào việc ẩn menu để bảo mật
+
+---
+
+### Lỗi 3: Sai đường dẫn layout (`Layout not found`)
+
+**Nguyên nhân:**
+
+* Sai đường dẫn tuyệt đối
+* Đổi tên file layout nhưng không cập nhật lại
+
+**Khắc phục:**
+
+* Luôn dùng đường dẫn tuyệt đối:
+
+```csharp
+Layout = "~/Views/Shared/_AdminLayout.cshtml";
+```
+
+* Kiểm tra đúng tên file và thư mục
+
+---
+
+### Lỗi 4: Layout Admin bị áp dụng cho toàn hệ thống
+
+**Nguyên nhân:**
+
+* Gán `AdminLayout` trong `Views/_ViewStart.cshtml`
+
+**Khắc phục:**
+
+* `Views/_ViewStart.cshtml` **chỉ** dùng ClientLayout
+* AdminLayout chỉ đặt trong `Views/Admin/_ViewStart.cshtml`
+
+---
+
+### Lỗi 5: Menu Admin hiển thị với User thường
+
+**Nguyên nhân:**
+
+* Dùng chung layout và render menu theo điều kiện `User.IsInRole`
+
+**Khắc phục:**
+
+* Tách layout vật lý (2 file riêng biệt)
+* Không xử lý phân quyền menu trong ClientLayout
+
+---
+
+### Lỗi 6: View dùng layout sai khi return từ Controller khác thư mục
+
+**Nguyên nhân:**
+
+* Return view không đúng đường dẫn
+
+**Ví dụ sai:**
+
+```csharp
+return View("Index");
+```
+
+**Khắc phục:**
+
+```csharp
+return View("~/Views/Admin/Dashboard/Index.cshtml");
+```
+
+## Các mẹo (Nên áp dụng)
+* Luôn tách thư mục Admin riêng (/Views/Admin) thay vì nhét chung rồi xử lý bằng if (User.IsInRole) trong layout.
+* Đặt tên layout rõ nghĩa: _ClientLayout.cshtml, _AdminLayout.cshtml – tránh dùng _Layout1, _LayoutAdminNew.
+* Kiểm tra bằng URL trực tiếp (/Admin/Dashboard) thay vì chỉ click menu.
+---
+
