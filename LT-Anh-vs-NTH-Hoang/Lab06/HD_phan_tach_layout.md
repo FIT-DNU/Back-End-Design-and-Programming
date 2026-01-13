@@ -146,11 +146,3 @@ Việc tách **ClientLayout** và **AdminLayout** là bắt buộc với dự á
 * Rõ ràng vai trò
 * Dễ kiểm soát quyền
 * Dễ mở rộng về sau (CMS, ERP, Dashboard)
-
----
-
-**Phù hợp cho:**
-
-* Đồ án sinh viên
-* Hệ thống quản trị nội bộ
-* Ứng dụng ASP.NET Core MVC có phân quyền
