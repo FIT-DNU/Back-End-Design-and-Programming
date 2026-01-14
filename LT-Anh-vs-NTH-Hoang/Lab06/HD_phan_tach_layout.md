@@ -1,5 +1,11 @@
 # Tách Layout Client và Admin trong ASP.NET Core MVC
 
+---
+Mục đích của phân tách Layout:
+# Phân tách rõ chức năng cho từng tác nhân
+# Tái sử dụng layout cho các chức năng phù hợp
+
+---
 Tài liệu này hướng dẫn chi tiết cách phân tách bố cục cho hai tác nhân Admin và User tương ứng với _AdminLayout.cshtml và _ClientLayout.cshtml.
 
 ---
