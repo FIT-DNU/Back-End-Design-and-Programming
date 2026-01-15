@@ -9,257 +9,294 @@
 
 ---
 
-Tài liệu này hướng dẫn chi tiết cách xây dựng hệ thống xác thực người dùng với đăng ký, đăng nhập và đăng xuất sử dụng Cookie Authentication.
+Tài liệu này hướng dẫn chi tiết cách xây dựng hệ thống xác thực người dùng với đăng ký, đăng nhập và đăng xuất sử dụng Cookie Authentication trong dự án **LabToChucWebsite**.
 
 ---
 
-## 1. Cấu trúc thư mục đề xuất
+## 1. Cấu trúc thư mục dự án
 
 ```plaintext
-/Controllers
- └─ AccountController.cs
- 
-/Models
- ├─ User.cs
- └─ /ViewModels
-     ├─ LoginViewModel.cs
-     └─ RegisterViewModel.cs
-
-/Views
- └─ /Account
-     ├─ Login.cshtml
-     └─ Register.cshtml
-
-/Data
- └─ ApplicationDbContext.cs
+LabToChucWebsite/
+├─ Controllers/
+│  ├─ AccountController.cs         ← Xử lý đăng nhập, đăng ký, đăng xuất
+│  ├─ HomeController.cs
+│  ├─ AdminController.cs
+│  ├─ SinhVienController.cs
+│  ├─ HocPhanController.cs
+│  └─ DiemHocPhanController.cs
+│
+├─ Models/
+│  ├─ User.cs                       ← Model người dùng
+│  ├─ SinhVien.cs
+│  ├─ HocPhan.cs
+│  ├─ DiemHocPhan.cs
+│  └─ ViewModels/
+│     ├─ LoginViewModel.cs         ← ViewModel đăng nhập
+│     └─ RegisterViewModel.cs      ← ViewModel đăng ký
+│
+├─ Views/
+│  ├─ Account/
+│  │  ├─ Login.cshtml              ← Form đăng nhập
+│  │  └─ Register.cshtml           ← Form đăng ký
+│  ├─ Shared/
+│  │  ├─ _ClientLayout.cshtml      ← Layout cho User
+│  │  ├─ _AdminLayout.cshtml       ← Layout cho Admin
+│  │  └─ _ValidationScriptsPartial.cshtml
+│  └─ _ViewStart.cshtml
+│
+├─ Data/
+│  └─ ApplicationDbContext.cs      ← DbContext chứa Users
+│
+└─ Program.cs                       ← Cấu hình Authentication
 ```
 
 ---
 
-## 2. Tạo Model User
+## 2. Model User - Thực tế trong dự án
 
-**File:** `/Models/User.cs`
-
-Mục đích:
-* Lưu trữ thông tin người dùng
-* Chứa tài khoản, mật khẩu đã hash và vai trò
-
-Các thuộc tính chính:
+**File:** `LabToChucWebsite/Models/User.cs`
 
 ```csharp
-public class User
+using System.ComponentModel.DataAnnotations;
+
+namespace LabToChucWebsite.Models
 {
-    public int UserId { get; set; }           // Khóa chính
-    public string UserName { get; set; }      // Tên đăng nhập duy nhất
-    public string PasswordHash { get; set; }  // Mật khẩu đã mã hóa
-    public string Role { get; set; }          // Vai trò (User, Admin)
+    public class User
+    {
+        public int Id { get; set; }              // Khóa chính
+        
+        [Required]
+        public string UserName { get; set; }     // Tên đăng nhập duy nhất
+        
+        [Required]
+        public string PasswordHash { get; set; } // Mật khẩu đã mã hóa
+        
+        public string Role { get; set; }         // Vai trò (User, Admin)
+    }
 }
 ```
 
-**Lưu ý quan trọng:**
-* **Không bao giờ** lưu mật khẩu dạng plain text
-* `PasswordHash` chứa chuỗi đã mã hóa bằng `PasswordHasher`
-* `Role` xác định quyền truy cập của người dùng
+**Đặc điểm:**
+* Khóa chính là `Id` (không phải `UserId`)
+* `UserName` và `PasswordHash` có `[Required]`
+* `PasswordHash` lưu chuỗi đã hash, **không bao giờ** lưu plain text
+* `Role` xác định quyền: "User" hoặc "Admin"
 
 ---
 
-## 3. Tạo ViewModel cho Đăng ký và Đăng nhập
+## 3. ViewModel cho Đăng ký và Đăng nhập
 
-### 3.1. LoginViewModel
+### 3.1. LoginViewModel - Thực tế
 
-**File:** `/Models/ViewModels/LoginViewModel.cs`
-
-Mục đích:
-* Nhận dữ liệu từ form đăng nhập
-* Validate thông tin đầu vào
+**File:** `LabToChucWebsite/Models/ViewModels/LoginViewModel.cs`
 
 ```csharp
-public class LoginViewModel
-{
-    [Required]
-    [DisplayName("Tài khoản")]
-    public string UserName { get; set; }
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
-    [DisplayName("Mật khẩu")]
-    [Required, DataType(DataType.Password)]
-    public string Password { get; set; }
+namespace LabToChucWebsite.Models.ViewModels
+{
+    public class LoginViewModel
+    {
+        [Required]
+        [DisplayName("Tài khoản")]
+        public string UserName { get; set; }
+
+        [DisplayName("Mật khẩu")]
+        [Required, DataType(DataType.Password)]
+        public string Password { get; set; }
+    }
 }
 ```
 
-**Data Annotations:**
-* `[Required]`: Bắt buộc nhập
-* `[DisplayName]`: Tên hiển thị trên form
-* `[DataType(DataType.Password)]`: Ẩn ký tự khi nhập
-
 ---
 
-### 3.2. RegisterViewModel
+### 3.2. RegisterViewModel - Thực tế (Không có ConfirmPassword)
 
-**File:** `/Models/ViewModels/RegisterViewModel.cs`
-
-Mục đích:
-* Nhận dữ liệu từ form đăng ký
-* Validate và so sánh mật khẩu xác nhận
+**File:** `LabToChucWebsite/Models/ViewModels/RegisterViewModel.cs`
 
 ```csharp
-public class RegisterViewModel
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+
+namespace LabToChucWebsite.Models.ViewModels
 {
-    [Required]
-    [DisplayName("Tài khoản")]
-    public string UserName { get; set; }
+    public class RegisterViewModel
+    {
+        [Required]
+        [DisplayName("Tài khoản")]
+        public string UserName { get; set; }
+        
+        [DisplayName("Mật khẩu")]
+        [Required, DataType(DataType.Password)]
+        public string Password { get; set; }
 
-    [Required]
-    [DisplayName("Mật khẩu")]
-    [DataType(DataType.Password)]
-    public string Password { get; set; }
-
-    [Required]
-    [DisplayName("Xác nhận mật khẩu")]
-    [DataType(DataType.Password)]
-    [Compare("Password", ErrorMessage = "Mật khẩu không khớp")]
-    public string ConfirmPassword { get; set; }
+        [Required]
+        [DisplayName("Xác nhận mật khẩu")]
+        [DataType(DataType.Password)]
+        [Compare("Password", ErrorMessage = "Mật khẩu không khớp")]
+        public string ConfirmPassword { get; set; }
+    }
 }
 ```
-
-**Data Annotations quan trọng:**
-* `[Compare("Password")]`: So sánh với thuộc tính Password
-* Tự động báo lỗi nếu hai mật khẩu không giống nhau
-
 ---
 
-## 4. Cấu hình Cookie Authentication trong Program.cs
+## 4. Cấu hình Cookie Authentication - Thực tế
 
-**File:** `/Program.cs`
+**File:** `LabToChucWebsite/Program.cs`
 
-### Bước 1: Thêm dịch vụ Authentication
+```csharp
+using LabToChucWebsite.Data;
+using Microsoft.EntityFrameworkCore;
 
+var builder = WebApplication.CreateBuilder(args);
+
+// Thêm services
+builder.Services.AddControllersWithViews();
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Cấu hình Cookie Authentication
+builder.Services.AddAuthentication("MyCookie")
+    .AddCookie("MyCookie", options =>
+    {
+        options.LoginPath = "/Account/Login";
+        // Không có AccessDeniedPath trong dự án này
+    });
+
+var app = builder.Build();
+
+// Middleware pipeline
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseRouting();
+
+// Thứ tự quan trọng: Authentication → Authorization
+app.UseAuthentication();    
+app.UseAuthorization();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.Run();
+```
+
+**Đặc điểm cấu hình:**
+* Scheme name: `"MyCookie"`
+* LoginPath: `/Account/Login`
+* **Không có** `AccessDeniedPath` - có thể thêm nếu cần
+* **Không có** `ExpireTimeSpan` - cookie tồn tại theo session
+
+**Đề xuất cải tiến:**
 ```csharp
 builder.Services.AddAuthentication("MyCookie")
     .AddCookie("MyCookie", options =>
     {
         options.LoginPath = "/Account/Login";
-        options.AccessDeniedPath = "/Account/AccessDenied";
-        options.ExpireTimeSpan = TimeSpan.FromHours(24);
+        options.AccessDeniedPath = "/Account/AccessDenied";  // Thêm
+        options.ExpireTimeSpan = TimeSpan.FromHours(24);     // Thêm
     });
 ```
 
-**Giải thích:**
-* `"MyCookie"`: Tên scheme authentication (phải nhất quán trong toàn bộ hệ thống)
-* `LoginPath`: Đường dẫn redirect khi chưa đăng nhập
-* `AccessDeniedPath`: Đường dẫn khi không có quyền truy cập
-* `ExpireTimeSpan`: Thời gian tồn tại của cookie (24 giờ)
-
 ---
 
-### Bước 2: Thêm middleware vào pipeline
+## 5. AccountController - Thực tế trong dự án
 
-```csharp
-app.UseAuthentication();  // ← Phải đặt trước UseAuthorization
-app.UseAuthorization();
-```
-
-**⚠️ Cảnh báo:**
-* Thứ tự middleware rất quan trọng
-* `UseAuthentication()` **bắt buộc** đặt trước `UseAuthorization()`
-* Nếu sai thứ tự, hệ thống sẽ không xác thực được người dùng
-
----
-
-## 5. Tạo AccountController
-
-**File:** `/Controllers/AccountController.cs`
-
-Mục đích:
-* Xử lý nghiệp vụ đăng ký, đăng nhập, đăng xuất
-* Tạo Cookie xác thực sau khi đăng nhập thành công
+**File:** `LabToChucWebsite/Controllers/AccountController.cs`
 
 ### 5.1. Cấu trúc Controller
 
 ```csharp
-[Authorize]  // Yêu cầu đăng nhập cho toàn bộ controller
-public class AccountController : Controller
-{
-    private readonly ApplicationDbContext _context;
+using LabToChucWebsite.Data;
+using LabToChucWebsite.Models;
+using LabToChucWebsite.Models.ViewModels;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
-    public AccountController(ApplicationDbContext context)
+namespace LabToChucWebsite.Controllers
+{
+    // Xác thực controller
+    [Authorize]
+    public class AccountController : Controller
     {
-        _context = context;
+        private readonly ApplicationDbContext _context;
+
+        public AccountController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+        
+        // Các action...
     }
-    
-    // Các action...
 }
 ```
 
 ---
 
-### 5.2. Action Đăng ký (Register)
-
-#### HTTP GET - Hiển thị form
+### 5.2. Action Đăng ký - Thực tế
 
 ```csharp
-[AllowAnonymous]  // Cho phép truy cập khi chưa đăng nhập
+// AllowAnonymous là cho phép truy cập cho người dùng không xác định
+[AllowAnonymous]
 public IActionResult Register() => View();
-```
 
-#### HTTP POST - Xử lý đăng ký
-
-```csharp
+// Xử lý phương thức đăng ký
 [HttpPost]
 [AllowAnonymous]
 public IActionResult Register(RegisterViewModel model)
 {
     if (!ModelState.IsValid) return View(model);
 
-    // 1. Tạo PasswordHasher
     var hasher = new PasswordHasher<User>();
 
-    // 2. Tạo đối tượng User mới
     var user = new User
     {
         UserName = model.UserName,
         Role = "User"  // Mặc định là User
     };
 
-    // 3. Hash mật khẩu
     user.PasswordHash = hasher.HashPassword(user, model.Password);
 
-    // 4. Lưu vào database
     _context.Users.Add(user);
     _context.SaveChanges();
 
-    // 5. Redirect đến trang Login
     return RedirectToAction("Login");
 }
 ```
 
 **Luồng xử lý:**
-1. Validate dữ liệu đầu vào
-2. Tạo user với role mặc định là "User"
-3. Hash mật khẩu bằng `PasswordHasher<User>`
-4. Lưu vào database
-5. Chuyển hướng đến trang đăng nhập
+1. Validate ModelState
+2. Tạo `PasswordHasher<User>`
+3. Tạo đối tượng User với Role = "User"
+4. Hash password và gán vào `PasswordHash`
+5. Lưu vào database
+6. Redirect đến Login
 
 ---
 
-### 5.3. Action Đăng nhập (Login)
-
-#### HTTP GET - Hiển thị form
+### 5.3. Action Đăng nhập - Thực tế
 
 ```csharp
 [AllowAnonymous]
 public IActionResult Login() => View();
-```
 
-#### HTTP POST - Xử lý đăng nhập
-
-```csharp
+// Xử lý phương thức đăng nhập
 [HttpPost]
 [AllowAnonymous]
 public async Task<IActionResult> Login(LoginViewModel model)
 {
     if (!ModelState.IsValid) return View(model);
 
-    // 1. Tìm user theo username
     var user = _context.Users
         .FirstOrDefault(u => u.UserName == model.UserName);
 
@@ -269,7 +306,6 @@ public async Task<IActionResult> Login(LoginViewModel model)
         return View(model);
     }
 
-    // 2. Verify mật khẩu
     var hasher = new PasswordHasher<User>();
     var result = hasher.VerifyHashedPassword(
         user, user.PasswordHash, model.Password);
@@ -280,21 +316,18 @@ public async Task<IActionResult> Login(LoginViewModel model)
         return View(model);
     }
 
-    // 3. Tạo Claims
+    // Tạo cookie
     var claims = new List<Claim>
     {
         new Claim(ClaimTypes.Name, user.UserName),
         new Claim(ClaimTypes.Role, user.Role)
     };
 
-    // 4. Tạo Identity và Principal
     var identity = new ClaimsIdentity(claims, "MyCookie");
     var principal = new ClaimsPrincipal(identity);
 
-    // 5. Tạo Cookie
     await HttpContext.SignInAsync("MyCookie", principal);
 
-    // 6. Redirect theo Role
     if (user.Role == "Admin")
         return RedirectToAction("Index", "Admin");
 
@@ -304,23 +337,22 @@ public async Task<IActionResult> Login(LoginViewModel model)
 
 **Luồng xử lý:**
 1. Validate ModelState
-2. Kiểm tra username tồn tại
-3. Xác minh mật khẩu bằng `VerifyHashedPassword`
-4. Tạo Claims (Name, Role)
-5. Tạo ClaimsIdentity và ClaimsPrincipal
-6. Gọi `SignInAsync` để tạo cookie
-7. Redirect theo role
-
-**Claims quan trọng:**
-* `ClaimTypes.Name`: Dùng cho `User.Identity.Name`
-* `ClaimTypes.Role`: Dùng cho `User.IsInRole("Admin")`
+2. Tìm user theo username
+3. Kiểm tra user tồn tại → nếu không: "Sai tài khoản"
+4. Verify password bằng `VerifyHashedPassword`
+5. Nếu sai: "Sai mật khẩu"
+6. Tạo Claims (Name, Role)
+7. Tạo ClaimsIdentity với scheme "MyCookie"
+8. SignInAsync để tạo cookie
+9. Redirect: Admin → `/Admin/Index`, User → `/Home/Index`
 
 ---
 
-### 5.4. Action Đăng xuất (Logout)
+### 5.4. Action Đăng xuất - Thực tế
 
 ```csharp
-[Authorize]  // Phải đã đăng nhập
+// Đăng xuất
+[Authorize]
 public async Task<IActionResult> Logout()
 {
     await HttpContext.SignOutAsync("MyCookie");
@@ -329,57 +361,63 @@ public async Task<IActionResult> Logout()
 ```
 
 **Xử lý:**
-* Gọi `SignOutAsync` với đúng scheme name
+* SignOutAsync với scheme "MyCookie"
 * Xóa cookie xác thực
-* Redirect về trang Login
+* Redirect về Login
 
 ---
 
-## 6. Tạo View cho Account
+## 6. Views - Thực tế trong dự án
 
-### 6.1. View Đăng nhập
+### 6.1. View Login - Thực tế
 
-**File:** `/Views/Account/Login.cshtml`
+**File:** `LabToChucWebsite/Views/Account/Login.cshtml`
 
 ```razor
+@using LabToChucWebsite.Models.ViewModels
 @model LoginViewModel
+
 @{
     ViewData["Title"] = "Đăng nhập";
-    Layout = null;  // Không dùng layout chung
+    Layout = null;
 }
 
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8" />
     <title>Đăng nhập</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
 </head>
-<body>
-    <div class="container mt-5">
-        <div class="row justify-content-center">
+<body class="bg-light">
+
+    <div class="container">
+        <div class="row justify-content-center align-items-center vh-100">
             <div class="col-md-4">
                 <div class="card shadow">
                     <div class="card-body">
-                        <h3 class="text-center mb-4">Đăng nhập</h3>
-                        
+                        <h4 class="text-center mb-4">Đăng nhập</h4>
+
                         <form asp-action="Login" method="post">
-                            <div asp-validation-summary="All" class="text-danger"></div>
-                            
                             <div class="mb-3">
                                 <label asp-for="UserName" class="form-label"></label>
                                 <input asp-for="UserName" class="form-control" />
                                 <span asp-validation-for="UserName" class="text-danger"></span>
                             </div>
-                            
+
                             <div class="mb-3">
                                 <label asp-for="Password" class="form-label"></label>
                                 <input asp-for="Password" class="form-control" />
                                 <span asp-validation-for="Password" class="text-danger"></span>
                             </div>
-                            
-                            <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">
+                                    Đăng nhập
+                                </button>
+                            </div>
                         </form>
-                        
+
                         <div class="text-center mt-3">
                             <a asp-action="Register">Chưa có tài khoản? Đăng ký</a>
                         </div>
@@ -388,29 +426,32 @@ public async Task<IActionResult> Logout()
             </div>
         </div>
     </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.0.0/jquery.validate.unobtrusive.min.js"></script>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
 </body>
 </html>
 ```
 
-**Các thành phần quan trọng:**
-* `asp-validation-summary="All"`: Hiển thị tất cả lỗi
-* `asp-for`: Binding với property trong ViewModel
-* `asp-validation-for`: Hiển thị lỗi cho từng field
-* Client-side validation scripts: jQuery Validate
+**Đặc điểm:**
+* Bootstrap từ `~/lib/bootstrap` (local, không phải CDN)
+* Layout = null (không dùng layout chung)
+* Centered vertically với `vh-100` và `align-items-center`
+* Validation scripts qua `_ValidationScriptsPartial`
+* **Không có** `asp-validation-summary="All"`
 
 ---
 
-### 6.2. View Đăng ký
+### 6.2. View Register - Thực tế
 
-**File:** `/Views/Account/Register.cshtml`
+**File:** `LabToChucWebsite/Views/Account/Register.cshtml`
 
 ```razor
+@using LabToChucWebsite.Models.ViewModels
 @model RegisterViewModel
+
 @{
     ViewData["Title"] = "Đăng ký";
     Layout = null;
@@ -419,41 +460,39 @@ public async Task<IActionResult> Logout()
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8" />
     <title>Đăng ký</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
 </head>
-<body>
-    <div class="container mt-5">
-        <div class="row justify-content-center">
+<body class="bg-light">
+
+    <div class="container">
+        <div class="row justify-content-center align-items-center vh-100">
             <div class="col-md-4">
                 <div class="card shadow">
                     <div class="card-body">
-                        <h3 class="text-center mb-4">Đăng ký tài khoản</h3>
-                        
+                        <h4 class="text-center mb-4">Đăng ký</h4>
+
                         <form asp-action="Register" method="post">
-                            <div asp-validation-summary="All" class="text-danger"></div>
-                            
                             <div class="mb-3">
                                 <label asp-for="UserName" class="form-label"></label>
                                 <input asp-for="UserName" class="form-control" />
                                 <span asp-validation-for="UserName" class="text-danger"></span>
                             </div>
-                            
+
                             <div class="mb-3">
                                 <label asp-for="Password" class="form-label"></label>
                                 <input asp-for="Password" class="form-control" />
                                 <span asp-validation-for="Password" class="text-danger"></span>
                             </div>
-                            
-                            <div class="mb-3">
-                                <label asp-for="ConfirmPassword" class="form-label"></label>
-                                <input asp-for="ConfirmPassword" class="form-control" />
-                                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-success">
+                                    Đăng ký
+                                </button>
                             </div>
-                            
-                            <button type="submit" class="btn btn-success w-100">Đăng ký</button>
                         </form>
-                        
+
                         <div class="text-center mt-3">
                             <a asp-action="Login">Đã có tài khoản? Đăng nhập</a>
                         </div>
@@ -462,40 +501,41 @@ public async Task<IActionResult> Logout()
             </div>
         </div>
     </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.0.0/jquery.validate.unobtrusive.min.js"></script>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
 </body>
 </html>
 ```
 
-**Lưu ý:**
-* Cần thêm field `ConfirmPassword`
-* Validation tự động kiểm tra hai mật khẩu khớp nhau
-* Link chuyển đổi giữa Login và Register
+**Đặc điểm:**
+* Tương tự Login, dùng Bootstrap local
+* Chỉ có UserName và Password (không có ConfirmPassword)
+* Button màu xanh lá (`btn-success`)
 
 ---
 
-## 7. Bảo vệ Controller và Action bằng [Authorize]
+## 7. Bảo vệ Controller bằng [Authorize]
 
-### 7.1. Bảo vệ toàn Controller
+### 7.1. HomeController (Có trong dự án)
 
 ```csharp
-[Authorize]  // Tất cả action yêu cầu đăng nhập
+// Tất cả action yêu cầu đăng nhập
+[Authorize]
 public class HomeController : Controller
 {
-    // Các action chỉ truy cập khi đã đăng nhập
+    // ...
 }
 ```
 
 ---
 
-### 7.2. Bảo vệ theo Role
+### 7.2. AdminController - Bảo vệ theo Role
 
 ```csharp
-[Authorize(Roles = "Admin")]  // Chỉ Admin truy cập được
+[Authorize(Roles = "Admin")]
 public class AdminController : Controller
 {
     public IActionResult Index()
@@ -505,397 +545,419 @@ public class AdminController : Controller
 }
 ```
 
-**Quan trọng:**
-* Không chỉ ẩn menu trong View
-* Phải bảo vệ cả Controller/Action bằng attribute
-* User thường không thể truy cập Admin bằng URL trực tiếp
-
 ---
 
-### 7.3. Cho phép truy cập ẩn danh
+### 7.3. Controllers khác trong dự án
 
 ```csharp
 [Authorize]
-public class AccountController : Controller
-{
-    [AllowAnonymous]  // Override [Authorize] của controller
-    public IActionResult Login()
+public class SinhVienController : Controller { }
+
+[Authorize]
+public class HocPhanController : Controller { }
+
+[Authorize]
+public class DiemHocPhanController : Controller { }
+```
+
+**Quan trọng:**
+* Tất cả controller quản lý có `[Authorize]`
+* Admin controller có `[Authorize(Roles = "Admin")]`
+* Account controller có `[Authorize]` ở class level, nhưng Login/Register có `[AllowAnonymous]`
+
+---
+
+## 8. Hiển thị thông tin trong Layout
+
+### 8.1. _ClientLayout.cshtml - Thực tế
+
+```razor
+@{
+    if (User.IsInRole("Admin"))
     {
-        return View();
+        <li class="nav-item">
+            <a class="nav-link" href="/Admin/Index">
+                <i class="fas fa-user-circle"></i> Quản trị hệ thống
+            </a>
+        </li>
     }
 }
+<li class="nav-item">
+    <a class="nav-link" href="/Account/Logout">
+        <i class="bi bi-box-arrow-right"></i> Đăng xuất
+    </a>
+</li>
 ```
 
-**Khi nào dùng:**
-* Login, Register phải có `[AllowAnonymous]`
-* Tránh redirect loop
+**Đặc điểm:**
+* Kiểm tra `User.IsInRole("Admin")` để hiển thị menu Admin
+* Menu Đăng xuất luôn hiển thị khi đã login
 
 ---
 
-## 8. Hiển thị thông tin người dùng trong View
+## 9. Các lỗi thường gặp trong dự án này
 
-### 8.1. Kiểm tra đã đăng nhập
+### Lỗi 1: Không có ConfirmPassword validation
+
+**Hiện trạng:**
+RegisterViewModel không có field ConfirmPassword
+
+**Rủi ro:**
+* User có thể nhập nhầm mật khẩu khi đăng ký
+* Không có cơ chế xác nhận
+
+**Khắc phục:**
+Thêm vào RegisterViewModel:
+
+```csharp
+[Required]
+[DisplayName("Xác nhận mật khẩu")]
+[DataType(DataType.Password)]
+[Compare("Password", ErrorMessage = "Mật khẩu không khớp")]
+public string ConfirmPassword { get; set; }
+```
+
+Và trong View Register:
 
 ```razor
-@if (User.Identity.IsAuthenticated)
-{
-    <p>Xin chào, @User.Identity.Name</p>
-}
-else
-{
-    <a href="/Account/Login">Đăng nhập</a>
-}
+<div class="mb-3">
+    <label asp-for="ConfirmPassword" class="form-label"></label>
+    <input asp-for="ConfirmPassword" class="form-control" />
+    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+</div>
 ```
 
 ---
 
-### 8.2. Kiểm tra Role
+### Lỗi 2: Cookie không có thời gian hết hạn
 
-```razor
-@if (User.IsInRole("Admin"))
-{
-    <li class="nav-item">
-        <a class="nav-link" href="/Admin/Index">
-            <i class="fas fa-user-shield"></i> Quản trị
-        </a>
-    </li>
-}
-```
-
----
-
-### 8.3. Lấy Claims trong Controller
-
+**Hiện trạng:**
 ```csharp
-public IActionResult Profile()
-{
-    var userName = User.Identity.Name;
-    var role = User.FindFirst(ClaimTypes.Role)?.Value;
-    
-    ViewBag.UserName = userName;
-    ViewBag.Role = role;
-    
-    return View();
-}
-```
-
----
-
-## 9. Các lỗi thường gặp và Cách khắc phục
-
-### Lỗi 1: Redirect loop khi truy cập trang yêu cầu đăng nhập
-
-**Nguyên nhân:**
-* LoginPath trỏ đến action có `[Authorize]`
-* Login action không có `[AllowAnonymous]`
-
-**Khắc phục:**
-
-```csharp
-[AllowAnonymous]  // ← Bắt buộc
-public IActionResult Login() => View();
-```
-
----
-
-### Lỗi 2: Sau khi đăng nhập vẫn không được xác thực
-
-**Nguyên nhân:**
-* Chưa gọi `UseAuthentication()` trong Program.cs
-* Hoặc gọi sau `UseAuthorization()`
-
-**Khắc phục:**
-
-```csharp
-app.UseAuthentication();  // ← Phải đặt trước
-app.UseAuthorization();
-```
-
----
-
-### Lỗi 3: User.Identity.Name trả về null
-
-**Nguyên nhân:**
-* Không thêm Claim `ClaimTypes.Name` khi SignIn
-
-**Khắc phục:**
-
-```csharp
-var claims = new List<Claim>
-{
-    new Claim(ClaimTypes.Name, user.UserName),  // ← Bắt buộc
-    new Claim(ClaimTypes.Role, user.Role)
-};
-```
-
----
-
-### Lỗi 4: Password luôn sai khi đăng nhập
-
-**Nguyên nhân:**
-* Lưu password plain text thay vì hash
-* Hash không đúng cách
-* Dùng sai phương thức verify
-
-**Khắc phục:**
-
-```csharp
-// ĐÚNG: Khi đăng ký
-var hasher = new PasswordHasher<User>();
-user.PasswordHash = hasher.HashPassword(user, model.Password);
-
-// ĐÚNG: Khi đăng nhập
-var result = hasher.VerifyHashedPassword(user, user.PasswordHash, model.Password);
-if (result != PasswordVerificationResult.Success)
-{
-    ModelState.AddModelError("", "Sai mật khẩu");
-}
-
-// SAI: Không dùng so sánh trực tiếp
-if (user.PasswordHash != model.Password)  // ← SAI!
-```
-
----
-
-### Lỗi 5: ModelState.IsValid luôn trả về false
-
-**Nguyên nhân:**
-* Thiếu Data Annotations trong ViewModel
-* Dữ liệu form không khớp với property
-* Thiếu validation scripts trong View
-
-**Khắc phục:**
-
-1. **Kiểm tra ViewModel:**
-
-```csharp
-[Required]  // ← Bắt buộc
-[DisplayName("Tài khoản")]
-public string UserName { get; set; }
-```
-
-2. **Kiểm tra View:**
-
-```razor
-@* Phải có asp-for khớp với property *@
-<input asp-for="UserName" class="form-control" />
-```
-
-3. **Thêm validation scripts:**
-
-```html
-<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
-```
-
----
-
-### Lỗi 6: Logout không xóa được Cookie
-
-**Nguyên nhân:**
-* Gọi sai scheme name trong SignOutAsync
-* Scheme không khớp với lúc cấu hình
-
-**Khắc phục:**
-
-```csharp
-// Program.cs
-builder.Services.AddAuthentication("MyCookie")  // ← Tên scheme
-    .AddCookie("MyCookie", options => { ... });
-
-// AccountController.cs
-await HttpContext.SignOutAsync("MyCookie");  // ← Phải khớp
-```
-
----
-
-### Lỗi 7: Không redirect được sau khi đăng nhập
-
-**Nguyên nhân:**
-* Quên `return` trước `RedirectToAction`
-
-**Khắc phục:**
-
-```csharp
-// SAI
-if (user.Role == "Admin")
-    RedirectToAction("Index", "Admin");  // ← Không có return
-
-// ĐÚNG
-if (user.Role == "Admin")
-    return RedirectToAction("Index", "Admin");  // ← Có return
-```
-
----
-
-### Lỗi 8: User có thể truy cập Admin bằng URL trực tiếp
-
-**Nguyên nhân:**
-* Chỉ ẩn menu trong View
-* Không bảo vệ Controller bằng `[Authorize]`
-
-**Khắc phục:**
-
-```csharp
-[Authorize(Roles = "Admin")]  // ← Bắt buộc
-public class AdminController : Controller
-{
-    public IActionResult Index()
+builder.Services.AddAuthentication("MyCookie")
+    .AddCookie("MyCookie", options =>
     {
-        return View();
-    }
-}
+        options.LoginPath = "/Account/Login";
+        // Không có ExpireTimeSpan
+    });
 ```
 
-**Test:**
-* Đăng nhập với User thường
-* Thử truy cập trực tiếp `/Admin/Index`
-* Phải bị chuyển đến AccessDenied hoặc Login
-
----
-
-### Lỗi 9: Validation không hoạt động phía client
-
-**Nguyên nhân:**
-* Thiếu jQuery Validation scripts
-* Script được load sai thứ tự
+**Rủi ro:**
+* Cookie tồn tại theo session browser
+* Đóng browser = mất phiên đăng nhập
 
 **Khắc phục:**
-
-```html
-<!-- Thứ tự quan trọng -->
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.0.0/jquery.validate.unobtrusive.min.js"></script>
+```csharp
+builder.Services.AddAuthentication("MyCookie")
+    .AddCookie("MyCookie", options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.ExpireTimeSpan = TimeSpan.FromHours(24);
+        options.SlidingExpiration = true;  // Tự động gia hạn
+    });
 ```
 
 ---
 
-### Lỗi 10: PasswordHasher không tìm thấy
+### Lỗi 3: Không có AccessDeniedPath
 
-**Nguyên nhân:**
-* Thiếu using statement
+**Hiện trạng:**
+Khi User thường truy cập `/Admin/Index`, sẽ bị redirect về Login thay vì trang "Không có quyền"
 
 **Khắc phục:**
-
+1. **Cấu hình:**
 ```csharp
-using Microsoft.AspNetCore.Identity;  // ← Bắt buộc
+options.AccessDeniedPath = "/Account/AccessDenied";
 ```
 
----
-
-
-## 10. Nâng cao (Optional)
-
-### 10.1. Remember Me
-
-Thêm checkbox Remember Me vào LoginViewModel:
-
-```csharp
-public class LoginViewModel
-{
-    // ...existing properties...
-    
-    [DisplayName("Ghi nhớ đăng nhập")]
-    public bool RememberMe { get; set; }
-}
-```
-
-Sử dụng trong Login action:
-
-```csharp
-var authProperties = new AuthenticationProperties
-{
-    IsPersistent = model.RememberMe,
-    ExpiresUtc = model.RememberMe 
-        ? DateTimeOffset.UtcNow.AddDays(30) 
-        : DateTimeOffset.UtcNow.AddHours(24)
-};
-
-await HttpContext.SignInAsync("MyCookie", principal, authProperties);
-```
-
----
-
-### 10.2. Return URL
-
-Lưu URL người dùng muốn truy cập trước khi đăng nhập:
-
+2. **Tạo action:**
 ```csharp
 [AllowAnonymous]
-public IActionResult Login(string returnUrl = null)
+public IActionResult AccessDenied()
 {
-    ViewData["ReturnUrl"] = returnUrl;
     return View();
 }
+```
 
+3. **Tạo view:**
+```razor
+@{
+    ViewData["Title"] = "Truy cập bị từ chối";
+    Layout = null;
+}
+<div class="container">
+    <div class="alert alert-danger">
+        <h4>Bạn không có quyền truy cập trang này!</h4>
+        <a href="/" class="btn btn-primary">Về trang chủ</a>
+    </div>
+</div>
+```
+---
+
+### Lỗi 4: Không có validation summary trong View
+
+**Hiện trạng:**
+View không có `asp-validation-summary`, chỉ hiển thị lỗi từng field
+
+**Khắc phục:**
+Thêm vào form:
+
+```razor
+<form asp-action="Login" method="post">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+    <!-- Các field -->
+</form>
+```
+
+Hoặc hiển thị tất cả lỗi:
+
+```razor
+<div asp-validation-summary="All" class="alert alert-danger"></div>
+```
+
+---
+
+### Lỗi 5: Kiểm tra username trùng khi đăng ký
+
+**Hiện trạng:**
+Action Register không kiểm tra username đã tồn tại
+
+**Rủi ro:**
+* Lỗi database khi insert username trùng
+* Người dùng không hiểu lỗi gì
+
+**Khắc phục:**
+```csharp
 [HttpPost]
 [AllowAnonymous]
-public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
+public IActionResult Register(RegisterViewModel model)
 {
-    // ...xử lý đăng nhập...
-    
-    if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
-        return Redirect(returnUrl);
-    
-    return RedirectToAction("Index", "Home");
-}
-```
+    if (!ModelState.IsValid) return View(model);
 
----
-
-### 10.3. Account Lockout
-
-Khóa tài khoản sau nhiều lần đăng nhập sai:
-
-```csharp
-public class User
-{
-    // ...existing properties...
-    
-    public int AccessFailedCount { get; set; }
-    public DateTime? LockoutEnd { get; set; }
-    
-    public bool IsLockedOut()
+    // Kiểm tra username đã tồn tại
+    if (_context.Users.Any(u => u.UserName == model.UserName))
     {
-        return LockoutEnd.HasValue && LockoutEnd > DateTime.UtcNow;
+        ModelState.AddModelError("UserName", "Tài khoản đã tồn tại");
+        return View(model);
     }
+
+    var hasher = new PasswordHasher<User>();
+    var user = new User
+    {
+        UserName = model.UserName,
+        Role = "User"
+    };
+    user.PasswordHash = hasher.HashPassword(user, model.Password);
+
+    _context.Users.Add(user);
+    _context.SaveChanges();
+
+    TempData["Success"] = "Đăng ký thành công! Vui lòng đăng nhập.";
+    return RedirectToAction("Login");
 }
 ```
 
 ---
 
-### 10.4. Email Confirmation
+### Lỗi 6: Không có TempData thông báo sau Register
 
-Yêu cầu xác nhận email trước khi đăng nhập:
+**Hiện trạng:**
+Sau khi đăng ký thành công, redirect về Login không có thông báo
+
+**Khắc phục:**
 
 ```csharp
-public class User
+_context.SaveChanges();
+
+TempData["Success"] = "Đăng ký thành công! Vui lòng đăng nhập.";
+return RedirectToAction("Login");
+```
+
+Hiển thị trong Login.cshtml:
+
+```razor
+@if (TempData["Success"] != null)
 {
-    // ...existing properties...
-    
-    public string Email { get; set; }
-    public bool EmailConfirmed { get; set; }
+    <div class="alert alert-success alert-dismissible fade show">
+        <i class="fas fa-check-circle"></i> @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
 }
 ```
 
 ---
 
-### 10.5. Two-Factor Authentication (2FA)
+## 10. Code mẫu để cải tiến
 
-Thêm lớp bảo mật thứ hai với OTP.
+### 10.1. RegisterViewModel với ConfirmPassword
+
+```csharp
+public class RegisterViewModel
+{
+    [Required]
+    [DisplayName("Tài khoản")]
+    public string UserName { get; set; }
+    
+    [DisplayName("Mật khẩu")]
+    [Required, DataType(DataType.Password)]
+    public string Password { get; set; }
+    
+    [Required]
+    [DisplayName("Xác nhận mật khẩu")]
+    [DataType(DataType.Password)]
+    [Compare("Password", ErrorMessage = "Mật khẩu không khớp")]
+    public string ConfirmPassword { get; set; }
+}
+```
 
 ---
 
-## 11. Tài liệu tham khảo
+### 10.2. Register action đầy đủ
+
+```csharp
+[HttpPost]
+[AllowAnonymous]
+public IActionResult Register(RegisterViewModel model)
+{
+    if (!ModelState.IsValid) return View(model);
+
+    // Kiểm tra username trùng
+    if (_context.Users.Any(u => u.UserName == model.UserName))
+    {
+        ModelState.AddModelError("UserName", "Tài khoản đã tồn tại");
+        return View(model);
+    }
+
+    var hasher = new PasswordHasher<User>();
+    var user = new User
+    {
+        UserName = model.UserName,
+        Role = "User"
+    };
+    user.PasswordHash = hasher.HashPassword(user, model.Password);
+
+    _context.Users.Add(user);
+    _context.SaveChanges();
+
+    TempData["Success"] = "Đăng ký thành công! Vui lòng đăng nhập.";
+    return RedirectToAction("Login");
+}
+```
+
+---
+
+### 10.3. Program.cs đầy đủ
+
+```csharp
+builder.Services.AddAuthentication("MyCookie")
+    .AddCookie("MyCookie", options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.AccessDeniedPath = "/Account/AccessDenied";
+        options.ExpireTimeSpan = TimeSpan.FromHours(24);
+        options.SlidingExpiration = true;
+    });
+```
+
+---
+
+### 10.4. AccessDenied action và view
+
+**Action:**
+```csharp
+[AllowAnonymous]
+public IActionResult AccessDenied()
+{
+    return View();
+}
+```
+
+**View:** `Views/Account/AccessDenied.cshtml`
+```razor
+@{
+    ViewData["Title"] = "Truy cập bị từ chối";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Truy cập bị từ chối</title>
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body class="bg-light">
+    <div class="container">
+        <div class="row justify-content-center align-items-center vh-100">
+            <div class="col-md-6">
+                <div class="card shadow">
+                    <div class="card-body text-center">
+                        <i class="fas fa-exclamation-triangle text-danger" style="font-size: 4rem;"></i>
+                        <h3 class="mt-3">Truy cập bị từ chối</h3>
+                        <p class="text-muted">Bạn không có quyền truy cập vào trang này.</p>
+                        <div class="d-grid gap-2">
+                            <a href="/" class="btn btn-primary">Về trang chủ</a>
+                            <a asp-action="Logout" class="btn btn-outline-secondary">Đăng xuất</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+```
+
+---
+
+## 11. Mẹo và Best Practices
+
+### 11.1. Bảo mật
+
+* **Đã làm:** Hash password bằng PasswordHasher
+* **Đã làm:** Dùng Claims-based authentication
+* **Nên thêm:** Kiểm tra username trùng
+* **Nên thêm:** Đặt thời gian hết hạn cookie
+* **Nên thêm:** Validation phức tạp hơn cho password (độ dài, ký tự đặc biệt)
+
+---
+
+### 11.2. User Experience
+
+* **Đã làm:** Form đơn giản, dễ sử dụng
+* **Đã làm:** Link chuyển đổi Login/Register
+* **Nên thêm:** TempData thông báo thành công/thất bại
+* **Nên thêm:** ConfirmPassword để tránh nhầm lẫn
+* **Nên thêm:** Remember Me checkbox
+* **Nên thêm:** Loading indicator khi submit
+
+---
+
+### 11.3. Code Quality
+
+* **Đã làm:** Tách ViewModel riêng
+* **Đã làm:** Dùng `[Authorize]` attribute đúng cách
+* **Đã làm:** Comment code tiếng Việt rõ ràng
+* **Nên thêm:** Try-catch xử lý exception
+* **Nên thêm:** Logging các sự kiện login/logout
+
+---
+
+## 12. Tài liệu tham khảo
 
 * [ASP.NET Core Authentication](https://learn.microsoft.com/en-us/aspnet/core/security/authentication/)
 * [Cookie Authentication](https://learn.microsoft.com/en-us/aspnet/core/security/authentication/cookie)
 * [Authorization in ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/security/authorization/)
 * [PasswordHasher Class](https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.passwordhasher-1)
+* [Data Annotations](https://learn.microsoft.com/en-us/dotnet/api/system.componentmodel.dataannotations)
 
 ---
 
 **Kết luận:**
 
-Hệ thống xác thực Cookie-based là giải pháp đơn giản, hiệu quả và phù hợp cho hầu hết ứng dụng ASP.NET Core MVC. Tài liệu này cung cấp đầy đủ kiến thức từ cơ bản đến nâng cao, giúp bạn xây dựng chức năng đăng nhập, đăng ký và đăng xuất một cách chuyên nghiệp.
+Dự án **LabToChucWebsite** đã triển khai thành công chức năng xác thực cơ bản với Cookie Authentication. Hệ thống hoạt động ổn định với các tính năng:
+- Đăng ký tài khoản mới
+- Đăng nhập với xác thực mật khẩu hash
+- Phân quyền Admin/User
+- Đăng xuất và xóa cookie
+
+**Các cải tiến đề xuất** trong tài liệu sẽ giúp tăng độ an toàn, trải nghiệm người dùng và chất lượng code tốt hơn.
