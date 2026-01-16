@@ -188,23 +188,6 @@ app.MapControllerRoute(
 app.Run();
 ```
 
-**Đặc điểm cấu hình:**
-* Scheme name: `"MyCookie"`
-* LoginPath: `/Account/Login`
-* **Không có** `AccessDeniedPath` - có thể thêm nếu cần
-* **Không có** `ExpireTimeSpan` - cookie tồn tại theo session
-
-**Đề xuất cải tiến:**
-```csharp
-builder.Services.AddAuthentication("MyCookie")
-    .AddCookie("MyCookie", options =>
-    {
-        options.LoginPath = "/Account/Login";
-        options.AccessDeniedPath = "/Account/AccessDenied";  // Thêm
-        options.ExpireTimeSpan = TimeSpan.FromHours(24);     // Thêm
-    });
-```
-
 ---
 
 ## 5. AccountController - Thực tế trong dự án
