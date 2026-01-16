@@ -283,6 +283,11 @@ public IActionResult Register(RegisterViewModel model)
 ### 5.3. Action Đăng nhập (AccountController.cs)
 
 ```csharp
+[AllowAnonymous]
+public IActionResult Login()
+{
+    return View();
+}
 [HttpPost]
 [AllowAnonymous] // Cho phép truy cập khi chưa đăng nhập
 public async Task<IActionResult> Login(LoginViewModel model)
