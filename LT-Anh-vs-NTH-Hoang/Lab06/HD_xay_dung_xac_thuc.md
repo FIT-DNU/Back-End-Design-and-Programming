@@ -82,6 +82,13 @@ namespace LabToChucWebsite.Models
 * `PasswordHash` lưu chuỗi đã hash, **không bao giờ** lưu plain text
 * `Role` xác định quyền: "User" hoặc "Admin"
 
+## Đăng ký DBSet<User> trong Data/ApplicationDbContext.cs
+
+```csharp
+        public DbSet<User> Users { get; set; }
+
+```
+
 ---
 
 ## 3. ViewModel cho Đăng ký và Đăng nhập
