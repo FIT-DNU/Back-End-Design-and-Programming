@@ -223,7 +223,7 @@ namespace LabToChucWebsite.Controllers
             _context = context;
         }
         
-        // Các action...
+        // Các action đăng nhập, đăng ký, đăng xuất
     }
 }
 ```
