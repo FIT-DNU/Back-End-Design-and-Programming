@@ -641,42 +641,7 @@ builder.Services.AddAuthentication("MyCookie")
 
 ---
 
-### Lỗi 3: Không có AccessDeniedPath
-
-**Hiện trạng:**
-Khi User thường truy cập `/Admin/Index`, sẽ bị redirect về Login thay vì trang "Không có quyền"
-
-**Khắc phục:**
-1. **Cấu hình:**
-```csharp
-options.AccessDeniedPath = "/Account/AccessDenied";
-```
-
-2. **Tạo action:**
-```csharp
-[AllowAnonymous]
-public IActionResult AccessDenied()
-{
-    return View();
-}
-```
-
-3. **Tạo view:**
-```razor
-@{
-    ViewData["Title"] = "Truy cập bị từ chối";
-    Layout = null;
-}
-<div class="container">
-    <div class="alert alert-danger">
-        <h4>Bạn không có quyền truy cập trang này!</h4>
-        <a href="/" class="btn btn-primary">Về trang chủ</a>
-    </div>
-</div>
-```
----
-
-### Lỗi 4: Không có validation summary trong View
+### Lỗi 3: Không có validation summary trong View
 
 **Hiện trạng:**
 View không có `asp-validation-summary`, chỉ hiển thị lỗi từng field
@@ -699,7 +664,7 @@ Hoặc hiển thị tất cả lỗi:
 
 ---
 
-### Lỗi 5: Kiểm tra username trùng khi đăng ký
+### Lỗi 4: Kiểm tra username trùng khi đăng ký
 
 **Hiện trạng:**
 Action Register không kiểm tra username đã tồn tại
@@ -741,7 +706,7 @@ public IActionResult Register(RegisterViewModel model)
 
 ---
 
-### Lỗi 6: Không có TempData thông báo sau Register
+### Lỗi 5: Không có TempData thông báo sau Register
 
 **Hiện trạng:**
 Sau khi đăng ký thành công, redirect về Login không có thông báo
@@ -770,31 +735,9 @@ Hiển thị trong Login.cshtml:
 ---
 
 ## 10. Code mẫu để cải tiến
-
-### 10.1. RegisterViewModel với ConfirmPassword
-
-```csharp
-public class RegisterViewModel
-{
-    [Required]
-    [DisplayName("Tài khoản")]
-    public string UserName { get; set; }
-    
-    [DisplayName("Mật khẩu")]
-    [Required, DataType(DataType.Password)]
-    public string Password { get; set; }
-    
-    [Required]
-    [DisplayName("Xác nhận mật khẩu")]
-    [DataType(DataType.Password)]
-    [Compare("Password", ErrorMessage = "Mật khẩu không khớp")]
-    public string ConfirmPassword { get; set; }
-}
-```
-
 ---
 
-### 10.2. Register action đầy đủ
+### 10.1. Register action đầy đủ
 
 ```csharp
 [HttpPost]
@@ -828,7 +771,7 @@ public IActionResult Register(RegisterViewModel model)
 
 ---
 
-### 10.3. Program.cs đầy đủ
+### 10.2. Program.cs đầy đủ
 
 ```csharp
 builder.Services.AddAuthentication("MyCookie")
@@ -843,7 +786,7 @@ builder.Services.AddAuthentication("MyCookie")
 
 ---
 
-### 10.4. AccessDenied action và view
+### 10.3. AccessDenied action và view
 
 **Action:**
 ```csharp
