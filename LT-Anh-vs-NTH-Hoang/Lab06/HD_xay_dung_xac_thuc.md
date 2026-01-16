@@ -52,7 +52,7 @@ LabToChucWebsite/
 
 ---
 
-## 2. Model User - Thực tế trong dự án
+## 2. Model User
 
 **File:** `LabToChucWebsite/Models/User.cs`
 
@@ -86,7 +86,7 @@ namespace LabToChucWebsite.Models
 
 ## 3. ViewModel cho Đăng ký và Đăng nhập
 
-### 3.1. LoginViewModel - Thực tế
+### 3.1. LoginViewModel
 
 **File:** `LabToChucWebsite/Models/ViewModels/LoginViewModel.cs`
 
