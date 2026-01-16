@@ -447,7 +447,8 @@ public async Task<IActionResult> Logout()
 
 **File:** `LabToChucWebsite/Views/Account/Register.cshtml`
 
-```razor@using LabToChucWebsite.Models.ViewModels
+```razor
+@using LabToChucWebsite.Models.ViewModels
 @model RegisterViewModel
 
 @{
