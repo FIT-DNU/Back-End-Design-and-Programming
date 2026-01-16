@@ -230,13 +230,15 @@ namespace LabToChucWebsite.Controllers
 
 ---
 
-### 5.2. Action Đăng ký - Thực tế
+### 5.2. Action Đăng ký (AccountController.cs)
 
 ```csharp
 // AllowAnonymous là cho phép truy cập cho người dùng không xác định
 [AllowAnonymous]
-public IActionResult Register() => View();
-
+public IActionResult Register()
+{
+    return View();
+}
 // Xử lý phương thức đăng ký
 [HttpPost]
 [AllowAnonymous]
@@ -271,11 +273,14 @@ public IActionResult Register(RegisterViewModel model)
 
 ---
 
-### 5.3. Action Đăng nhập - Thực tế
+### 5.3. Action Đăng nhập (AccountController.cs)
 
 ```csharp
 [AllowAnonymous]
-public IActionResult Login() => View();
+public IActionResult Login()
+{
+    return View();
+}
 
 // Xử lý phương thức đăng nhập
 [HttpPost]
@@ -335,7 +340,7 @@ public async Task<IActionResult> Login(LoginViewModel model)
 
 ---
 
-### 5.4. Action Đăng xuất - Thực tế
+### 5.4. Action Đăng xuất (AccountController.cs)
 
 ```csharp
 // Đăng xuất
@@ -431,7 +436,7 @@ public async Task<IActionResult> Logout()
 
 ---
 
-### 6.2. View Register - Thực tế
+### 6.2. View Register
 
 **File:** `LabToChucWebsite/Views/Account/Register.cshtml`
 
@@ -506,7 +511,7 @@ public async Task<IActionResult> Logout()
 
 ## 7. Bảo vệ Controller bằng [Authorize]
 
-### 7.1. HomeController (Có trong dự án)
+### 7.1. HomeController
 
 ```csharp
 // Tất cả action yêu cầu đăng nhập
@@ -556,7 +561,7 @@ public class DiemHocPhanController : Controller { }
 
 ## 8. Hiển thị thông tin trong Layout
 
-### 8.1. _ClientLayout.cshtml - Thực tế
+### 8.1. _ClientLayout.cshtml
 
 ```razor
 @{
