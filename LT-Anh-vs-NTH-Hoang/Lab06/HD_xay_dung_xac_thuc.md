@@ -141,7 +141,7 @@ namespace LabToChucWebsite.Models.ViewModels
 ```
 ---
 
-## 4. Cấu hình Cookie Authentication - Thực tế
+## 4. Cấu hình Cookie Authentication (Xác thực bằng Cookie)
 
 **File:** `LabToChucWebsite/Program.cs`
 
