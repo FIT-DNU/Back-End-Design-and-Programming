@@ -111,7 +111,7 @@ namespace LabToChucWebsite.Models.ViewModels
 
 ---
 
-### 3.2. RegisterViewModel - Thực tế (Không có ConfirmPassword)
+### 3.2. RegisterViewModel
 
 **File:** `LabToChucWebsite/Models/ViewModels/RegisterViewModel.cs`
 
