@@ -156,7 +156,9 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Cấu hình Cookie Authentication
+// Sao chép phần này vào cấu hình Program.cs
+// Cấu hình Cookie Authentication -> Nếu không có Cookie xác thực
+// --> Chuyển sang đường dẫn đăng nhập --> /Account/Login
 builder.Services.AddAuthentication("MyCookie")
     .AddCookie("MyCookie", options =>
     {
@@ -177,6 +179,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
+// Copy phần này
+// Đăng ký sử dụng xác thực
 // Thứ tự quan trọng: Authentication → Authorization
 app.UseAuthentication();    
 app.UseAuthorization();
