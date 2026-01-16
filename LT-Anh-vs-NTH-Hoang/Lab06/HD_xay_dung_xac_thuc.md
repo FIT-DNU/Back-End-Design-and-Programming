@@ -283,19 +283,15 @@ public IActionResult Register(RegisterViewModel model)
 ### 5.3. Action Đăng nhập (AccountController.cs)
 
 ```csharp
-[AllowAnonymous]
-public IActionResult Login()
-{
-    return View();
-}
-
-// Xử lý phương thức đăng nhập
 [HttpPost]
-[AllowAnonymous]
+[AllowAnonymous] // Cho phép truy cập khi chưa đăng nhập
 public async Task<IActionResult> Login(LoginViewModel model)
 {
-    if (!ModelState.IsValid) return View(model);
+    // Validate dữ liệu form
+    if (!ModelState.IsValid)
+        return View(model);
 
+    // Tìm user theo username
     var user = _context.Users
         .FirstOrDefault(u => u.UserName == model.UserName);
 
@@ -305,6 +301,7 @@ public async Task<IActionResult> Login(LoginViewModel model)
         return View(model);
     }
 
+    // So sánh mật khẩu (hash)
     var hasher = new PasswordHasher<User>();
     var result = hasher.VerifyHashedPassword(
         user, user.PasswordHash, model.Password);
@@ -315,18 +312,21 @@ public async Task<IActionResult> Login(LoginViewModel model)
         return View(model);
     }
 
-    // Tạo cookie
+    // Tạo claims để lưu vào cookie xác thực
     var claims = new List<Claim>
     {
         new Claim(ClaimTypes.Name, user.UserName),
         new Claim(ClaimTypes.Role, user.Role)
     };
 
+    // Scheme phải trùng với cấu hình Authentication
     var identity = new ClaimsIdentity(claims, "MyCookie");
     var principal = new ClaimsPrincipal(identity);
 
+    // Đăng nhập: ghi cookie
     await HttpContext.SignInAsync("MyCookie", principal);
 
+    // Điều hướng theo role
     if (user.Role == "Admin")
         return RedirectToAction("Index", "Admin");
 
@@ -447,8 +447,7 @@ public async Task<IActionResult> Logout()
 
 **File:** `LabToChucWebsite/Views/Account/Register.cshtml`
 
-```razor
-@using LabToChucWebsite.Models.ViewModels
+```razor@using LabToChucWebsite.Models.ViewModels
 @model RegisterViewModel
 
 @{
@@ -483,6 +482,12 @@ public async Task<IActionResult> Logout()
                                 <label asp-for="Password" class="form-label"></label>
                                 <input asp-for="Password" class="form-control" />
                                 <span asp-validation-for="Password" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="ConfirmPassword" class="form-label"></label>
+                                <input asp-for="ConfirmPassword" class="form-control" />
+                                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                             </div>
 
                             <div class="d-grid">
