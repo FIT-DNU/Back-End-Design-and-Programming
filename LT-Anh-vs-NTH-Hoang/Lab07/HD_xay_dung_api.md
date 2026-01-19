@@ -109,6 +109,61 @@ Swagger UI cho phép:
 [Route("api/sinhvien")]
 public class SinhVienApiController : ControllerBase
 {
+    private readonly ApplicationDbContext _context;
+
+    public SinhVienApiController(ApplicationDbContext context)
+    {
+        _context = context;
+    }
+
+    // GET: api/sinhvien
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var data = await _context.SinhViens.ToListAsync();
+        return Ok(data);
+    }
+
+    // GET: api/sinhvien/5
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(int id)
+    {
+        var sv = await _context.SinhViens.FindAsync(id);
+        if (sv == null) return NotFound();
+        return Ok(sv);
+    }
+
+    // POST: api/sinhvien
+    [HttpPost]
+    public async Task<IActionResult> Create(SinhVien sinhVien)
+    {
+        _context.SinhViens.Add(sinhVien);
+        await _context.SaveChangesAsync();
+        return CreatedAtAction(nameof(GetById), new { id = sinhVien.Id }, sinhVien);
+    }
+
+    // PUT: api/sinhvien/5
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(int id, SinhVien sinhVien)
+    {
+        if (id != sinhVien.Id) return BadRequest();
+
+        _context.Entry(sinhVien).State = EntityState.Modified;
+        await _context.SaveChangesAsync();
+        return NoContent();
+    }
+
+    // DELETE: api/sinhvien/5
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var sv = await _context.SinhViens.FindAsync(id);
+        if (sv == null) return NotFound();
+
+        _context.SinhViens.Remove(sv);
+        await _context.SaveChangesAsync();
+        return NoContent();
+    }
 }
 ```
 
