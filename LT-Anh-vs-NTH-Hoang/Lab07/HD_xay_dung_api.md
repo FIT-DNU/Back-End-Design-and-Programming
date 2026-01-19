@@ -28,7 +28,7 @@ Trong dự án ASP.NET Core:
 
 ## 2. Cài đặt thư viện Swagger (NuGet Packages)
 
-Cài đặt gói Swagger qua **Package Manager Console**:
+Bạn cần cài đặt các gói sau thông qua Package Manager Console trong Visual Studio. Mở Tools > NuGet Package Manager > Package Manager Console và chạy các lệnh sau:
 
 ```powershell
 Install-Package Swashbuckle.AspNetCore
