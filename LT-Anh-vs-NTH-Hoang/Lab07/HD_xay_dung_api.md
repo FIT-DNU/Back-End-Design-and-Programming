@@ -1,10 +1,32 @@
 # HƯỚNG DẪN NHÚNG SWAGGER CHO ASP.NET CORE 8 MVC API
 
-Tài liệu này hướng dẫn chi tiết cách tích hợp **Swagger (OpenAPI)** vào dự án **ASP.NET Core 8 MVC API** nhằm hỗ trợ kiểm thử và tài liệu hóa API.
+*(Áp dụng cho dự án có sẵn MVC Web và API tách riêng)*
+
+Tài liệu này hướng dẫn cách tích hợp **Swagger (OpenAPI)** cho **ASP.NET Core 8 MVC API**, trong trường hợp dự án **đã có MVC Web (Controller + View)** và cần xây dựng **API riêng để phục vụ client / test / mobile / frontend khác**.
 
 ---
 
-## 1. Cài đặt thư viện Swagger (NuGet Packages)
+## 1. Lưu ý kiến trúc trước khi nhúng Swagger
+
+Trong dự án ASP.NET Core:
+
+* **MVC Web Controller**
+
+  * Kế thừa `Controller`
+  * Trả về `View()`
+  * Không dùng Swagger
+
+* **MVC API Controller**
+
+  * Kế thừa `ControllerBase`
+  * Trả về JSON (`Ok`, `NotFound`, …)
+  * Dùng Swagger
+
+**Swagger CHỈ áp dụng cho API Controller**, không áp dụng cho Controller trả View.
+
+---
+
+## 2. Cài đặt thư viện Swagger (NuGet Packages)
 
 Cài đặt gói Swagger qua **Package Manager Console**:
 
@@ -14,14 +36,14 @@ Install-Package Swashbuckle.AspNetCore
 
 ---
 
-## 2. Đăng ký Swagger Service trong Program.cs
+## 3. Đăng ký Swagger Service trong Program.cs
 
 Mở file **`Program.cs`** và thêm các cấu hình sau:
 
 ```csharp
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Đăng ký Controller (MVC API)
+// 1. Đăng ký Controller cho API
 builder.Services.AddControllers();
 
 // 2. Đăng ký Swagger
@@ -36,7 +58,7 @@ var app = builder.Build();
 
 ---
 
-## 3. Kích hoạt Swagger Middleware
+## 4. Kích hoạt Swagger Middleware
 
 Trong cùng file **`Program.cs`**, thêm cấu hình Middleware:
 
@@ -48,7 +70,7 @@ if (app.Environment.IsDevelopment())
 }
 ```
 
-Sau đó giữ nguyên các Middleware còn lại:
+Giữ nguyên các Middleware khác:
 
 ```csharp
 app.UseHttpsRedirection();
@@ -60,7 +82,7 @@ app.Run();
 
 ---
 
-## 4. Truy cập Swagger UI
+## 5. Truy cập Swagger UI
 
 Sau khi chạy project, truy cập:
 
@@ -71,26 +93,30 @@ https://localhost:{port}/swagger
 Swagger UI cho phép:
 
 * Xem danh sách API
-* Xem Request / Response
+* Xem cấu trúc Request / Response
 * Gửi request trực tiếp để test API
 
 ---
 
-## 5. Yêu cầu bắt buộc để Swagger hiển thị đúng API
+## 6. Yêu cầu bắt buộc để Swagger hiển thị đúng API
 
-### 5.1 Controller phải có `[ApiController]`
+### 6.1 API Controller phải có `[ApiController]`
+
+**Ví dụ Controller API đúng chuẩn:**
 
 ```csharp
 [ApiController]
-[Route("api/[controller]")]
-public class SinhVienController : ControllerBase
+[Route("api/sinhvien")]
+public class SinhVienApiController : ControllerBase
 {
 }
 ```
 
+**Không dùng `Controller` và không trả `View()`**
+
 ---
 
-### 5.2 Action phải khai báo HTTP Method
+### 6.2 Action phải khai báo HTTP Method
 
 ```csharp
 [HttpGet]
@@ -102,9 +128,9 @@ Thiếu HTTP Attribute → Swagger không hiển thị API
 
 ---
 
-## 6. Hiển thị mô tả API bằng XML Comment
+## 7. Hiển thị mô tả API bằng XML Comment
 
-### 6.1 Bật XML Comment trong file `.csproj`
+### 7.1 Bật XML Comment trong file `.csproj`
 
 ```xml
 <PropertyGroup>
@@ -114,9 +140,9 @@ Thiếu HTTP Attribute → Swagger không hiển thị API
 
 ---
 
-### 6.2 Cấu hình Swagger đọc XML Comment
+### 7.2 Cấu hình Swagger đọc XML Comment
 
-Thêm đoạn sau vào `AddSwaggerGen()`:
+Thêm vào `AddSwaggerGen()`:
 
 ```csharp
 using System.Reflection;
@@ -131,7 +157,7 @@ builder.Services.AddSwaggerGen(options =>
 
 ---
 
-### 6.3 Viết Comment cho API
+### 7.3 Viết Comment cho API Method
 
 ```csharp
 /// <summary>
@@ -148,12 +174,15 @@ Swagger sẽ hiển thị mô tả rõ ràng cho từng API.
 
 ---
 
-## 7. Các lỗi thường gặp và Cách khắc phục
+## 8. Các lỗi thường gặp và Cách khắc phục
 
 ### 1. Không truy cập được `/swagger`
 
-**Nguyên nhân:** Chưa gọi `UseSwagger()` hoặc `UseSwaggerUI()`
-**Cách sửa:** Kiểm tra lại cấu hình Middleware trong `Program.cs`
+**Nguyên nhân:**
+Chưa gọi `UseSwagger()` hoặc `UseSwaggerUI()`
+
+**Cách sửa:**
+Kiểm tra lại Middleware trong `Program.cs`
 
 ---
 
@@ -161,29 +190,31 @@ Swagger sẽ hiển thị mô tả rõ ràng cho từng API.
 
 **Nguyên nhân:**
 
+* Controller kế thừa `Controller` thay vì `ControllerBase`
 * Thiếu `[ApiController]`
 * Thiếu `[HttpGet]`, `[HttpPost]`, …
 
-**Cách sửa:** Kiểm tra lại Controller và Action
+**Cách sửa:**
+Tách riêng **API Controller** và kiểm tra lại Attribute
 
 ---
 
 ### 3. Swagger không hiển thị Model
 
-**Nguyên nhân:** Action không nhận hoặc không trả về model rõ ràng
-**Cách sửa:** Khai báo tham số và kiểu trả về cụ thể
+**Nguyên nhân:**
+Action không nhận hoặc không trả về model cụ thể
+
+**Cách sửa:**
+Khai báo rõ tham số và kiểu trả về
 
 ---
 
 ### 4. Swagger chỉ chạy ở môi trường Development
 
-**Nguyên nhân:** Swagger được đặt trong điều kiện `IsDevelopment()`
-**Cách sửa (nếu cần):** Bỏ điều kiện môi trường (không khuyến khích cho production)
+**Nguyên nhân:**
+Swagger được đặt trong điều kiện `IsDevelopment()`
+
+**Cách sửa (nếu cần):**
+Bỏ điều kiện môi trường *(không khuyến khích cho production)*
 
 ---
-
-* Viết README **Swagger + JWT**
-* Chuẩn hóa README cho **toàn bộ môn học**
-* Hoặc chỉnh lại cho đúng **chuẩn báo cáo sinh viên**
-
-Nói thẳng yêu cầu, tôi làm tiếp.
